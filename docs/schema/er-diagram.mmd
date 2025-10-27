@@ -1,0 +1,174 @@
+erDiagram
+    USERS {
+        SERIAL user_id PK
+        TEXT email
+        TEXT username
+        TEXT password_hash
+        TEXT role
+        TEXT first_name
+        TEXT last_name
+        DATE date_of_birth
+        BOOLEAN is_active
+        TIMESTAMPTZ created_at
+        TIMESTAMPTZ updated_at
+    }
+
+    BREEDS {
+        VARCHAR breed_code PK
+        VARCHAR name
+    }
+
+    DOGS {
+        SERIAL dog_id PK
+        INT owner_id FK
+        VARCHAR breed_code FK
+        TEXT name
+        TEXT size
+        TEXT notes
+        NUMERIC weight_kg
+        BOOLEAN is_active
+        TIMESTAMPTZ created_at
+        TIMESTAMPTZ updated_at
+    }
+
+    DOG_PHOTOS {
+        SERIAL photo_id PK
+        INT dog_id FK
+        TEXT url
+        TIMESTAMPTZ uploaded_at
+    }
+
+    ADDRESSES {
+        SERIAL address_id PK
+        INT user_id FK
+        TEXT label
+        TEXT home_number
+        DOUBLE lat
+        DOUBLE lon
+        TEXT city
+        TEXT street
+        TEXT zipcode
+        TIMESTAMPTZ created_at
+    }
+
+    RESERVATIONS {
+        SERIAL reservation_id PK
+        INT dog_id FK
+        INT walker_id FK
+        TIMESTAMPTZ scheduled_start
+        TIMESTAMPTZ scheduled_end
+        TEXT status
+        TIMESTAMPTZ created_at
+        TIMESTAMPTZ updated_at
+    }
+
+    OFFERS {
+        SERIAL offer_id PK
+        INT walker_id FK
+        INT reservation_id FK
+        TEXT description
+        INT price_cents
+        BOOLEAN is_active
+        TEXT status
+        INT location_start_id FK
+        INT location_end_id FK
+        TIMESTAMPTZ created_at
+        TIMESTAMPTZ updated_at
+    }
+
+    PAYMENTS {
+        SERIAL payment_id PK
+        INT reservation_id FK
+        INT payer_id FK
+        INT payee_id FK
+        INT amount_cents
+        TEXT currency
+        TEXT status
+        TEXT provider_ref
+        TIMESTAMPTZ created_at
+    }
+
+    ESCROWS {
+        SERIAL escrow_id PK
+        INT reservation_id FK
+        BIGINT amount_cents
+        TEXT status
+        TIMESTAMPTZ created_at
+        TIMESTAMPTZ released_at
+        INT wallet_transaction_id FK
+    }
+
+    REVIEWS {
+        SERIAL review_id PK
+        INT reservation_id FK
+        INT author_id FK
+        INT subject_user_id FK
+        INT dog_id FK
+        TEXT review_type
+        INT rating
+        TEXT comment
+        TIMESTAMPTZ created_at
+    }
+
+    EVENTS {
+        SERIAL event_id PK
+        TEXT entity
+        INT entity_id
+        TEXT event
+        INT actor_id FK
+        JSONB payload
+        TIMESTAMPTZ created_at
+    }
+
+    WALLETS {
+        SERIAL wallet_id PK
+        INT user_id FK
+        TEXT currency
+        BIGINT balance_cents
+        TIMESTAMPTZ created_at
+        TIMESTAMPTZ updated_at
+        BIGINT version
+    }
+
+    TRANSACTIONS {
+        SERIAL transaction_id PK
+        INT wallet_id FK
+        INT user_id FK
+        BIGINT amount_cents
+        BIGINT balance_after_cents
+        TEXT type
+        TEXT description
+        TEXT provider_ref
+        INT reservation_id FK
+        INT escrow_id FK
+        TIMESTAMPTZ created_at
+    }
+
+    USERS ||--o{ DOGS : owns
+    USERS ||--o{ ADDRESSES : has
+    USERS ||--o{ RESERVATIONS : walks
+    USERS ||--o{ OFFERS : proposes
+    USERS ||--o{ PAYMENTS : pays
+    USERS ||--o{ REVIEWS : writes
+    USERS ||--o{ EVENTS : triggers
+    USERS ||--|| WALLETS : has
+    USERS ||--o{ TRANSACTIONS : initiates
+
+    BREEDS ||--o{ DOGS : classifies
+    DOGS ||--o{ DOG_PHOTOS : has
+    DOGS ||--o{ RESERVATIONS : booked
+    DOGS ||--o{ REVIEWS : reviewed
+
+    ADDRESSES ||--o{ OFFERS : start_or_end
+
+    RESERVATIONS ||--o{ OFFERS : receives
+    RESERVATIONS ||--o{ PAYMENTS : paid_for
+    RESERVATIONS ||--o{ REVIEWS : reviewed
+    RESERVATIONS ||--o{ EVENTS : logged
+    RESERVATIONS ||--o{ ESCROWS : secured
+    RESERVATIONS ||--o{ TRANSACTIONS : linked
+
+    OFFERS ||--o{ PAYMENTS : triggers
+
+    WALLETS ||--o{ TRANSACTIONS : logs
+    ESCROWS ||--|| TRANSACTIONS : sourced
