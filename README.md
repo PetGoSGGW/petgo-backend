@@ -1,9 +1,12 @@
 # PetGo Backend
 
-Backend service for the PetGo application. Built with Spring Boot and Hibernate using PostgreSQL for data persistence.
+Backend service for the PetGo application. Built with Spring Boot and Hibernate.
 
 ## Database
-A PostgreSQL database is required.
+
+For the development profile, a local PostgreSQL database is required.
 The database is not created automatically, so you must create it manually before running the backend.
 
-For development profile, create a local database (example name: petgodb) and update the connection details in application-dev.properties.
+The production database is not defined yet and will be configured later once deployment details are finalized.
+
+For development, create a local database (example name: petgodb) and set the required connection values through environment variables defined in application-dev.properties.
