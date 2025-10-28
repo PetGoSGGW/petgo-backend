@@ -1,4 +1,4 @@
-package pl.petgo.backend.domain;
+package pl.petgo.backend.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
