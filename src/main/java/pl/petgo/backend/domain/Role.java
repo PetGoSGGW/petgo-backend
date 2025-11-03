@@ -1,4 +1,4 @@
-package pl.petgo.backend.entity;
+package pl.petgo.backend.domain;
 
 public enum Role {
     OWNER,

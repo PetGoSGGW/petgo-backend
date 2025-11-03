@@ -1,0 +1,45 @@
+package pl.petgo.backend.domain;
+
+public enum DomainEventType {
+    // User
+    USER_CREATED,
+    USER_UPDATED,
+    PASSWORD_CHANGED,
+    USER_DEACTIVATED,
+
+    // Dog
+    DOG_CREATED,
+    DOG_UPDATED,
+    DOG_PHOTO_ADDED,
+    DOG_PHOTO_REMOVED,
+    DOG_DEACTIVATED,
+
+    // Reservation
+    RESERVATION_CREATED,
+    RESERVATION_CANCELLED,
+    RESERVATION_COMPLETED,
+
+    // Offer
+    OFFER_SUBMITTED,
+    OFFER_ACCEPTED,
+    OFFER_REJECTED,
+
+    // Payment
+    PAYMENT_INITIATED,
+    PAYMENT_PAID,
+    PAYMENT_REFUNDED,
+
+    // Wallet
+    WALLET_CREATED,
+    WALLET_TOPUP,
+    WALLET_PAYOUT,
+    BALANCE_ADJUSTED,
+
+    // Escrow
+    ESCROW_HELD,
+    ESCROW_RELEASED,
+    ESCROW_REFUNDED,
+
+    // Admin
+    ADMIN_ACTION
+}

@@ -6,7 +6,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import pl.petgo.backend.dto.*;
-import pl.petgo.backend.entity.User;
+import pl.petgo.backend.domain.User;
 import pl.petgo.backend.repository.UserRepository;
 import pl.petgo.backend.security.JwtService;
 

@@ -110,14 +110,19 @@ erDiagram
         TIMESTAMPTZ created_at
     }
 
-    EVENTS {
+    DOMAIN_EVENTS {
         SERIAL event_id PK
-        TEXT entity
-        INT entity_id
-        TEXT event
+        TEXT type
+        TEXT description
+        JSONB metadata_json
+        TIMESTAMPTZ occurred_at
         INT actor_id FK
-        JSONB payload
-        TIMESTAMPTZ created_at
+        INT target_user_id FK
+        INT target_dog_id FK
+        INT target_reservation_id FK
+        INT target_wallet_id FK
+        INT target_transaction_id FK
+        INT target_payment_id FK
     }
 
     WALLETS {
@@ -144,31 +149,38 @@ erDiagram
         TIMESTAMPTZ created_at
     }
 
+%% Relationships
     USERS ||--o{ DOGS : owns
     USERS ||--o{ ADDRESSES : has
     USERS ||--o{ RESERVATIONS : walks
     USERS ||--o{ OFFERS : proposes
     USERS ||--o{ PAYMENTS : pays
     USERS ||--o{ REVIEWS : writes
-    USERS ||--o{ EVENTS : triggers
     USERS ||--|| WALLETS : has
     USERS ||--o{ TRANSACTIONS : initiates
+    USERS ||--o{ DOMAIN_EVENTS : actor
 
     BREEDS ||--o{ DOGS : classifies
     DOGS ||--o{ DOG_PHOTOS : has
     DOGS ||--o{ RESERVATIONS : booked
     DOGS ||--o{ REVIEWS : reviewed
+    DOGS ||--o{ DOMAIN_EVENTS : target
 
     ADDRESSES ||--o{ OFFERS : start_or_end
 
     RESERVATIONS ||--o{ OFFERS : receives
     RESERVATIONS ||--o{ PAYMENTS : paid_for
     RESERVATIONS ||--o{ REVIEWS : reviewed
-    RESERVATIONS ||--o{ EVENTS : logged
     RESERVATIONS ||--o{ ESCROWS : secured
     RESERVATIONS ||--o{ TRANSACTIONS : linked
+    RESERVATIONS ||--o{ DOMAIN_EVENTS : target
 
     OFFERS ||--o{ PAYMENTS : triggers
 
     WALLETS ||--o{ TRANSACTIONS : logs
+    WALLETS ||--o{ DOMAIN_EVENTS : target
+
     ESCROWS ||--|| TRANSACTIONS : sourced
+
+    TRANSACTIONS ||--o{ DOMAIN_EVENTS : target
+    PAYMENTS ||--o{ DOMAIN_EVENTS : target

@@ -1,41 +1,38 @@
-package pl.petgo.backend.entity;
+package pl.petgo.backend.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.Instant;
-import java.time.LocalDate;
 
 @Entity
-@Table(name = "users")
+@Table(name = "reservations")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class User {
+public class Reservation {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long userId;
+    private Long reservationId;
 
-    @Column(nullable = false, unique = true)
-    private String email;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "dog_id", nullable = false)
+    private Dog dog;
 
-    @Column(unique = true)
-    private String username;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "walker_id", nullable = false)
+    private User walker;
 
-    private String passwordHash;
+    @Column(nullable = false)
+    private Instant scheduledStart;
+
+    @Column(nullable = false)
+    private Instant scheduledEnd;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Role role;
-
-    @Column(nullable = false)
-    private Boolean isActive = true;
-
-    private String firstName;
-    private String lastName;
-
-    private LocalDate dateOfBirth;
+    private ReservationStatus status;
 
     @Column(nullable = false, updatable = false)
     private Instant createdAt = Instant.now();

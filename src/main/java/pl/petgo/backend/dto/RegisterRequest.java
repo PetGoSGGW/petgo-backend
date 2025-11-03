@@ -1,7 +1,7 @@
 package pl.petgo.backend.dto;
 
 import jakarta.validation.constraints.*;
-import pl.petgo.backend.entity.Role;
+import pl.petgo.backend.domain.Role;
 
 public record RegisterRequest(
         @Email @NotBlank String email,
