@@ -9,7 +9,7 @@ public record RegisterRequest(
         @NotBlank String firstName,
         @NotBlank String lastName,
         @NotNull Role role,
-        String username
+        @NotBlank String username
 ) {
 
 }

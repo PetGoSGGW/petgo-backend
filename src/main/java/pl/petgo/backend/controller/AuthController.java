@@ -26,14 +26,14 @@ public class AuthController {
     }
 
     @GetMapping("/me")
-    public Object me(@AuthenticationPrincipal AppUserDetails user) {
-        var u = user.getUser();
-        return new Object() {
-            public final Long id = u.getUserId();
-            public final String email = u.getEmail();
-            public final String role = u.getRole().name();
-            public final String firstName = u.getFirstName();
-            public final String lastName = u.getLastName();
-        };
+    public MeResponse me(@AuthenticationPrincipal AppUserDetails principal) {
+        var u = principal.getUser();
+        return new MeResponse(
+                u.getUserId(),
+                u.getEmail(),
+                u.getRole().name(),
+                u.getFirstName(),
+                u.getLastName()
+        );
     }
 }
