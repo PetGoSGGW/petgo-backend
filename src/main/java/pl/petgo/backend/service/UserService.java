@@ -6,6 +6,7 @@ import pl.petgo.backend.domain.Address;
 import pl.petgo.backend.domain.User;
 import pl.petgo.backend.domain.Wallet;
 import pl.petgo.backend.dto.*;
+import pl.petgo.backend.error.DuplicateResourceException;
 import pl.petgo.backend.repository.AddressRepository;
 import pl.petgo.backend.repository.UserRepository;
 import pl.petgo.backend.repository.WalletRepository;
@@ -76,32 +77,30 @@ public class UserService {
         );
     }
 
+
     public UserResponse updateUser(Long id, UpdateUserRequest updatedUserData) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Użytkownik o ID " + id + " nie istnieje"));
 
         if (updatedUserData.username() != null) {
-            if (userRepository.existsByUsername(updatedUserData.username()))
-                throw new IllegalArgumentException("Username already used");
+            // kolizja, ale pomijamy bieżący rekord
+            if (userRepository.existsByUsernameAndUserIdNot(updatedUserData.username(), id)) {
+                throw new DuplicateResourceException("Username already used");
+            }
             user.setUsername(updatedUserData.username());
         }
+
         if (updatedUserData.email() != null) {
-            if (userRepository.existsByEmail(updatedUserData.email()))
-                throw new IllegalArgumentException("Email already used");
+            if (userRepository.existsByEmailAndUserIdNot(updatedUserData.email(), id)) {
+                throw new DuplicateResourceException("Email already used");
+            }
             user.setEmail(updatedUserData.email());
         }
-        if (updatedUserData.firstName() != null) {
-            user.setFirstName(updatedUserData.firstName());
-        }
-        if (updatedUserData.lastName() != null) {
-            user.setLastName(updatedUserData.lastName());
-        }
-        if (updatedUserData.role() != null) {
-            user.setRole(updatedUserData.role());
-        }
-        if (updatedUserData.dateOfBirth() != null) {
-            user.setDateOfBirth(updatedUserData.dateOfBirth());
-        }
+
+        if (updatedUserData.firstName() != null) user.setFirstName(updatedUserData.firstName());
+        if (updatedUserData.lastName() != null) user.setLastName(updatedUserData.lastName());
+        if (updatedUserData.role() != null) user.setRole(updatedUserData.role());
+        if (updatedUserData.dateOfBirth() != null) user.setDateOfBirth(updatedUserData.dateOfBirth());
 
         return toResponse(userRepository.save(user));
     }
