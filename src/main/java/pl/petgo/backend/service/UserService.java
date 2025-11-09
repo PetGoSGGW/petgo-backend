@@ -6,7 +6,6 @@ import pl.petgo.backend.domain.Address;
 import pl.petgo.backend.domain.User;
 import pl.petgo.backend.domain.Wallet;
 import pl.petgo.backend.dto.*;
-import pl.petgo.backend.error.DuplicateResourceException;
 import pl.petgo.backend.repository.AddressRepository;
 import pl.petgo.backend.repository.UserRepository;
 import pl.petgo.backend.repository.WalletRepository;
@@ -28,7 +27,7 @@ public class UserService {
                 u.getUserId(),
                 u.getUsername(),
                 u.getEmail(),
-                u.getRole(),
+                u.getRole() != null ? u.getRole().name() : null,
                 u.getFirstName(),
                 u.getLastName(),
                 u.getDateOfBirth()
@@ -42,8 +41,8 @@ public class UserService {
                 a.getAddressId(),
                 a.getLabel(),
                 a.getHomeNumber(),
-                a.getLatitude(),
-                a.getLongitude(),
+                a.getLat(),
+                a.getLon(),
                 a.getCity(),
                 a.getStreet(),
                 a.getZipcode(),
@@ -57,8 +56,8 @@ public class UserService {
         a.setUser(user);
         a.setLabel(dto.label());
         a.setHomeNumber(dto.homeNumber());
-        a.setLatitude(dto.lat());
-        a.setLongitude(dto.lon());
+        a.setLat(dto.lat());
+        a.setLon(dto.lon());
         a.setCity(dto.city());
         a.setStreet(dto.street());
         a.setZipcode(dto.zipcode());
@@ -77,29 +76,32 @@ public class UserService {
         );
     }
 
-
     public UserResponse updateUser(Long id, UpdateUserRequest updatedUserData) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Użytkownik o ID " + id + " nie istnieje"));
 
         if (updatedUserData.username() != null) {
-            if (userRepository.existsByUsernameAndUserIdNot(updatedUserData.username(), id)) {
-                throw new DuplicateResourceException("Username already used");
-            }
+            if (userRepository.existsByUsername(updatedUserData.username()))
+                throw new IllegalArgumentException("Username already used");
             user.setUsername(updatedUserData.username());
         }
-
         if (updatedUserData.email() != null) {
-            if (userRepository.existsByEmailAndUserIdNot(updatedUserData.email(), id)) {
-                throw new DuplicateResourceException("Email already used");
-            }
+            if (userRepository.existsByEmail(updatedUserData.email()))
+                throw new IllegalArgumentException("Email already used");
             user.setEmail(updatedUserData.email());
         }
-
-        if (updatedUserData.firstName() != null) user.setFirstName(updatedUserData.firstName());
-        if (updatedUserData.lastName() != null) user.setLastName(updatedUserData.lastName());
-        if (updatedUserData.role() != null) user.setRole(updatedUserData.role());
-        if (updatedUserData.dateOfBirth() != null) user.setDateOfBirth(updatedUserData.dateOfBirth());
+        if (updatedUserData.firstName() != null) {
+            user.setFirstName(updatedUserData.firstName());
+        }
+        if (updatedUserData.lastName() != null) {
+            user.setLastName(updatedUserData.lastName());
+        }
+        if (updatedUserData.role() != null) {
+            user.setRole(updatedUserData.role());
+        }
+        if (updatedUserData.dateOfBirth() != null) {
+            user.setDateOfBirth(updatedUserData.dateOfBirth());
+        }
 
         return toResponse(userRepository.save(user));
     }
