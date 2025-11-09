@@ -1,4 +1,4 @@
-package pl.petgo.backend.dto.wallet;
+package pl.petgo.backend.dto;
 
 package pl.petgo.backend.dto;
 
@@ -10,4 +10,5 @@ public record WalletResponse(
         Long balanceCents,
         Instant createdAt,
         Instant updatedAt
-) { }
+) {
+}
