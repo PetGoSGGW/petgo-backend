@@ -15,7 +15,7 @@ on:
 
 env:
   JWT_SECRET: 71daa26612417c4403d79168f769f504
-  DB_URL: jdbc:postgresql://localhost:5432
+  DB_URL: jdbc:postgresql://localhost:5432/petgo
   DB_USERNAME: postgres
   DB_PASSWORD: postgres
 
