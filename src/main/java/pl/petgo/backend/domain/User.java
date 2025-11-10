@@ -40,8 +40,9 @@ public class User {
     @Column(name = "is_active", nullable = false)
     private Boolean isActive = true;
 
-    @Column(name = "is_admin", nullable = false)
-    private Boolean isAdmin = false;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role", nullable = false)
+    private Role role = Role.USER;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
