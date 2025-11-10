@@ -24,9 +24,9 @@ public class Address {
 
     private String homeNumber;
 
-    private Double lat;
+    private Double latitude;
 
-    private Double lon;
+    private Double longitude;
 
     private String city;
 
@@ -35,7 +35,7 @@ public class Address {
     private String zipcode;
 
     @Column(nullable = false, updatable = false)
-    private Instant createdAt = Instant.now();
+    private Instant createdAt;
 
     @PrePersist
     protected void onCreate() {

@@ -14,6 +14,7 @@ public class Payment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "payment_id")
     private Long paymentId;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -28,19 +29,20 @@ public class Payment {
     @JoinColumn(name = "payee_id", nullable = false)
     private User payee;
 
-    @Column(nullable = false)
+    @Column(name = "amount_cents", nullable = false)
     private Long amountCents;
 
-    @Column(nullable = false)
+    @Column(name = "currency", nullable = false)
     private String currency;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "status", nullable = false)
     private PaymentStatus status;
 
+    @Column(name = "provider_ref")
     private String providerRef;
 
-    @Column(nullable = false, updatable = false)
+    @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt = Instant.now();
 
     @PrePersist

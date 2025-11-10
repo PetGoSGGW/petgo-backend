@@ -35,11 +35,6 @@ public enum DomainEventType {
     WALLET_PAYOUT,
     BALANCE_ADJUSTED,
 
-    // Escrow
-    ESCROW_HELD,
-    ESCROW_RELEASED,
-    ESCROW_REFUNDED,
-
     // Admin
     ADMIN_ACTION
 }

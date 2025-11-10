@@ -14,6 +14,7 @@ public class Offer {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "offer_id")
     private Long offerId;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -24,13 +25,14 @@ public class Offer {
     @JoinColumn(name = "reservation_id", nullable = false)
     private Reservation reservation;
 
-    @Column(nullable = false)
+    @Column(name = "price_cents", nullable = false)
     private Integer priceCents;
 
+    @Column(name = "description")
     private String description;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "status", nullable = false)
     private OfferStatus status = OfferStatus.PENDING;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -41,9 +43,10 @@ public class Offer {
     @JoinColumn(name = "location_end_id")
     private Address locationEnd;
 
-    @Column(nullable = false, updatable = false)
+    @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt = Instant.now();
 
+    @Column(name = "updated_at")
     private Instant updatedAt;
 
     @PrePersist

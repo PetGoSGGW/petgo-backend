@@ -5,37 +5,39 @@ import lombok.*;
 import java.time.Instant;
 
 @Entity
-@Table(name = "wallets")
+@Table(name = "availability_slots")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Wallet {
+public class AvailabilitySlot {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "wallet_id")
-    private Long walletId;
+    @Column(name = "slot_id")
+    private Long slotId;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false, unique = true)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Column(name = "currency", nullable = false)
-    private String currency;
+    @Column(name = "start_time", nullable = false)
+    private Instant startTime;
 
-    @Column(name = "balance_cents", nullable = false)
-    private Long balanceCents = 0L;
+    @Column(name = "end_time", nullable = false)
+    private Instant endTime;
+
+    @Column(name = "latitude", nullable = false)
+    private Double latitude;
+
+    @Column(name = "longitude", nullable = false)
+    private Double longitude;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt = Instant.now();
 
     @Column(name = "updated_at")
     private Instant updatedAt;
-
-    @Version
-    @Column(name = "version")
-    private Long version;
 
     @PrePersist
     protected void onCreate() {
