@@ -18,6 +18,7 @@ env:
   DB_URL: jdbc:postgresql://localhost:5432/petgo
   DB_USERNAME: postgres
   DB_PASSWORD: postgres
+  SPRING_PROFILES_ACTIVE: dev
 
 jobs:
   build:
@@ -27,7 +28,6 @@ jobs:
           ports:
             - 5432:5432
           env:
-            SPRING_PROFILES_ACTIVE: prod
             POSTGRES_USER: postgres
             POSTGRES_PASSWORD: postgres
             POSTGRES_DB: petgo
@@ -56,4 +56,4 @@ jobs:
       uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
 
     - name: Build with Gradle Wrapper
-      run: ./gradlew build
+      run: ./gradlew test
