@@ -14,24 +14,27 @@ public class Wallet {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "wallet_id")
     private Long walletId;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false, unique = true)
     private User user;
 
-    @Column(nullable = false)
+    @Column(name = "currency", nullable = false)
     private String currency;
 
-    @Column(nullable = false)
+    @Column(name = "balance_cents", nullable = false)
     private Long balanceCents = 0L;
 
-    @Column(nullable = false, updatable = false)
+    @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt = Instant.now();
 
+    @Column(name = "updated_at")
     private Instant updatedAt;
 
     @Version
+    @Column(name = "version")
     private Long version;
 
     @PrePersist

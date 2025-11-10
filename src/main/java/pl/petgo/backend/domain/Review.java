@@ -14,6 +14,7 @@ public class Review {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "review_id")
     private Long reviewId;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -33,15 +34,16 @@ public class Review {
     private Dog dog;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "review_type", nullable = false)
     private ReviewType reviewType;
 
-    @Column(nullable = false)
+    @Column(name = "rating", nullable = false)
     private Integer rating;
 
+    @Column(name = "comment")
     private String comment;
 
-    @Column(nullable = false, updatable = false)
+    @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt = Instant.now();
 
     @PrePersist

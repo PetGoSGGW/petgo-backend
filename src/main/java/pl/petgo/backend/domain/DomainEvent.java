@@ -14,6 +14,7 @@ public class DomainEvent {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "event_id")
     private Long eventId;
 
     @Enumerated(EnumType.STRING)
@@ -51,10 +52,10 @@ public class DomainEvent {
     @Column(length = 1000)
     private String description;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(name = "metadata_json", columnDefinition = "TEXT")
     private String metadataJson;
 
-    @Column(nullable = false, updatable = false)
+    @Column(name = "occurred_at", nullable = false, updatable = false)
     private Instant occurredAt = Instant.now();
 
     @PrePersist
