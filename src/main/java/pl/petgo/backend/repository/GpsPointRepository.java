@@ -6,5 +6,5 @@ import pl.petgo.backend.domain.GpsPoint;
 import java.util.List;
 
 public interface GpsPointRepository extends JpaRepository<GpsPoint, Long> {
-    List<GpsPoint> findBySessionIdOrderByRecordedAtAsc(Long sessionId);
+    List<GpsPoint> findBySession_SessionIdOrderByRecordedAtAsc(Long sessionId);
 }

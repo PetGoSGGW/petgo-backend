@@ -6,6 +6,6 @@ import pl.petgo.backend.domain.GpsSession;
 import java.util.Optional;
 
 public interface GpsSessionRepository extends JpaRepository<GpsSession, Long> {
-    Optional<GpsSession> findByReservationId(Long reservationId);
+    Optional<GpsSession> findByReservation_ReservationId(Long reservationId);
 }
 
