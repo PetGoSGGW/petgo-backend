@@ -18,8 +18,8 @@ public class AvailabilitySlot {
     private Long slotId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @JoinColumn(name = "offer_id", nullable = false)
+    private Offer offer;
 
     @Column(name = "start_time", nullable = false)
     private Instant startTime;
