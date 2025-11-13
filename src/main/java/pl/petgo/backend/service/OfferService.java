@@ -22,11 +22,9 @@ public class OfferService {
 
     @Transactional
     public Long createOffer(OfferCreateRequest request, Long walkerId) {
-        // 1. Pobierz użytkownika (Walkera) z bazy na podstawie ID z tokena
         User walker = userRepository.findById(walkerId)
                 .orElseThrow(() -> new IllegalArgumentException("Użytkownik nie istnieje"));
 
-        // 2. Utwórz obiekt Oferty
         Offer offer = Offer.builder()
                 .walker(walker)
                 .priceCents(request.priceCents())
@@ -35,30 +33,39 @@ public class OfferService {
                 .availabilitySlots(new ArrayList<>())
                 .build();
 
-        // 3. Przetwarzanie slotów (jeśli zostały przesłane)
         if (request.initialSlots() != null && !request.initialSlots().isEmpty()) {
-            List<AvailabilitySlot> slots = request.initialSlots().stream()
-                    .map(slotDto -> {
-                        if (!slotDto.endTime().isAfter(slotDto.startTime())) {
-                            throw new IllegalArgumentException("Data zakończenia musi być późniejsza niż data rozpoczęcia");
-                        }
+            List<AvailabilitySlot> slots = new ArrayList<>();
 
-                        return AvailabilitySlot.builder()
-                                .startTime(slotDto.startTime())
-                                .endTime(slotDto.endTime())
-                                .latitude(slotDto.latitude())
-                                .longitude(slotDto.longitude())
-                                .offer(offer)
-                                .build();
-                    })
-                    .toList();
+            for (var slotDto : request.initialSlots()) {
+                if (!slotDto.endTime().isAfter(slotDto.startTime())) {
+                    throw new IllegalArgumentException("Data zakończenia musi być późniejsza niż data rozpoczęcia");
+                }
 
+                boolean overlaps = slots.stream().anyMatch(existing ->
+                        isOverlapping(existing.getStartTime(), existing.getEndTime(), slotDto.startTime(), slotDto.endTime())
+                );
+
+                if (overlaps) {
+                    throw new IllegalArgumentException("Zdefiniowane sloty czasowe nakładają się na siebie!");
+                }
+
+                slots.add(AvailabilitySlot.builder()
+                        .startTime(slotDto.startTime())
+                        .endTime(slotDto.endTime())
+                        .latitude(slotDto.latitude())
+                        .longitude(slotDto.longitude())
+                        .offer(offer)
+                        .build());
+            }
             offer.getAvailabilitySlots().addAll(slots);
         }
 
-        // 4. Zapis do bazy (CascadeType.ALL w encji Offer zapisze też sloty)
         Offer savedOffer = offerRepository.save(offer);
 
         return savedOffer.getOfferId();
+    }
+
+    private boolean isOverlapping(java.time.Instant start1, java.time.Instant end1, java.time.Instant start2, java.time.Instant end2) {
+        return start1.isBefore(end2) && start2.isBefore(end1);
     }
 }
