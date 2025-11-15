@@ -5,10 +5,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.petgo.backend.domain.Offer;
 import pl.petgo.backend.domain.User;
-import pl.petgo.backend.dto.OfferCreateRequest;
+import pl.petgo.backend.dto.Offer.OfferCreateRequest;
 import pl.petgo.backend.repository.OfferRepository;
 import pl.petgo.backend.repository.UserRepository;
-import pl.petgo.backend.dto.OfferDto;
+import pl.petgo.backend.dto.Offer.OfferDto;
+import pl.petgo.backend.dto.Offer.OfferUpdateRequest;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,5 +47,29 @@ public class OfferService {
                 .stream()
                 .map(OfferDto::fromEntity)
                 .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public OfferDto updateOffer(Long offerId, OfferUpdateRequest request, Long userId) {
+        Offer offer = offerRepository.findById(offerId)
+                .orElseThrow(() -> new IllegalArgumentException("Oferta nie znaleziona ID: " + offerId));
+
+        if (!offer.getWalker().getUserId().equals(userId)) {
+            throw new SecurityException("Brak uprawnień do edycji oferty ID: " + offerId);
+        }
+
+        if (request.priceCents() != null) {
+            offer.setPriceCents(request.priceCents());
+        }
+
+        if (request.description() != null) {
+            offer.setDescription(request.description());
+        }
+
+        if (request.isActive() != null) {
+            offer.setActive(request.isActive());
+        }
+
+        return OfferDto.fromEntity(offerRepository.save(offer));
     }
 }
