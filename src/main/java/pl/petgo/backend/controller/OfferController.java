@@ -49,4 +49,15 @@ public class OfferController {
         OfferDto updatedOffer = offerService.updateOffer(offerId, request, userId);
         return ResponseEntity.ok(updatedOffer);
     }
+
+    @DeleteMapping("/{offerId}")
+    public ResponseEntity<Void> deleteOffer(
+            @PathVariable Long offerId,
+            @AuthenticationPrincipal AppUserDetails userDetails
+    ) {
+        Long userId = userDetails.getUser().getUserId();
+        offerService.deleteOffer(offerId, userId);
+
+        return ResponseEntity.noContent().build();
+    }
 }
