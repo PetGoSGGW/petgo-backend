@@ -8,8 +8,11 @@ import org.springframework.web.bind.annotation.*;
 import pl.petgo.backend.dto.OfferCreateRequest;
 import pl.petgo.backend.security.AppUserDetails;
 import pl.petgo.backend.service.OfferService;
+import org.springframework.web.bind.annotation.*;
+import pl.petgo.backend.dto.OfferDto;
 
 import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/offers")
@@ -28,5 +31,11 @@ public class OfferController {
         Long offerId = offerService.createOffer(request, userId);
 
         return ResponseEntity.created(URI.create("/api/offers/" + offerId)).build();
+    }
+
+    @GetMapping("/my")
+    public ResponseEntity<List<OfferDto>> getMyOffers(@AuthenticationPrincipal AppUserDetails principal) {
+        List<OfferDto> offers = offerService.getOffersForWalker(principal.getUser());
+        return ResponseEntity.ok(offers);
     }
 }
