@@ -3,7 +3,6 @@ package pl.petgo.backend.dto;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import java.util.List;
 
 public record OfferCreateRequest(
         @NotNull(message = "Cena jest wymagana")
@@ -11,7 +10,5 @@ public record OfferCreateRequest(
         Integer priceCents,
 
         @Size(max = 1000, message = "Opis może mieć maksymalnie 1000 znaków")
-        String description,
-
-        List<AvailableSlotRequest> initialSlots
+        String description
 ) {}
