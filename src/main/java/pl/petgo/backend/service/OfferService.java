@@ -8,8 +8,11 @@ import pl.petgo.backend.domain.User;
 import pl.petgo.backend.dto.OfferCreateRequest;
 import pl.petgo.backend.repository.OfferRepository;
 import pl.petgo.backend.repository.UserRepository;
+import pl.petgo.backend.dto.OfferDto;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -32,10 +35,16 @@ public class OfferService {
                 .build();
 
 
-
         Offer savedOffer = offerRepository.save(offer);
 
         return savedOffer.getOfferId();
     }
 
+    @Transactional(readOnly = true)
+    public List<OfferDto> getOffersForWalker(User walker) {
+        return offerRepository.findAllByWalker_UserId(walker.getUserId())
+                .stream()
+                .map(OfferDto::fromEntity)
+                .collect(Collectors.toList());
+    }
 }
