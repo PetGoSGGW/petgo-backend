@@ -5,11 +5,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import pl.petgo.backend.dto.OfferCreateRequest;
+import pl.petgo.backend.dto.Offer.OfferCreateRequest;
 import pl.petgo.backend.security.AppUserDetails;
 import pl.petgo.backend.service.OfferService;
-import org.springframework.web.bind.annotation.*;
-import pl.petgo.backend.dto.OfferDto;
+import pl.petgo.backend.dto.Offer.OfferDto;
+import pl.petgo.backend.dto.Offer.OfferUpdateRequest;
 
 import java.net.URI;
 import java.util.List;
@@ -37,5 +37,16 @@ public class OfferController {
     public ResponseEntity<List<OfferDto>> getMyOffers(@AuthenticationPrincipal AppUserDetails principal) {
         List<OfferDto> offers = offerService.getOffersForWalker(principal.getUser());
         return ResponseEntity.ok(offers);
+    }
+
+    @PatchMapping("/{offerId}")
+    public ResponseEntity<OfferDto> updateOffer(
+            @PathVariable Long offerId,
+            @Valid @RequestBody OfferUpdateRequest request,
+            @AuthenticationPrincipal AppUserDetails userDetails
+    ) {
+        Long userId = userDetails.getUser().getUserId();
+        OfferDto updatedOffer = offerService.updateOffer(offerId, request, userId);
+        return ResponseEntity.ok(updatedOffer);
     }
 }
