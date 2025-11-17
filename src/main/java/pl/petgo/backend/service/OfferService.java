@@ -72,4 +72,16 @@ public class OfferService {
 
         return OfferDto.fromEntity(offerRepository.save(offer));
     }
+
+    @Transactional
+    public void deleteOffer(Long offerId, Long userId) {
+        Offer offer = offerRepository.findById(offerId)
+                .orElseThrow(() -> new IllegalArgumentException("Oferta nie znaleziona ID: " + offerId));
+
+        if (!offer.getWalker().getUserId().equals(userId)) {
+            throw new SecurityException("Brak uprawnień do usunięcia oferty ID: " + offerId);
+        }
+
+        offerRepository.delete(offer);
+    }
 }
