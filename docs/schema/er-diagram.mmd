@@ -56,6 +56,7 @@ erDiagram
         SERIAL reservation_id PK
         INT dog_id FK
         INT walker_id FK
+        INT offer_id FK
         TIMESTAMPTZ scheduled_start
         TIMESTAMPTZ scheduled_end
         TEXT status
@@ -66,13 +67,9 @@ erDiagram
     OFFERS {
         SERIAL offer_id PK
         INT walker_id FK
-        INT reservation_id FK
         TEXT description
         INT price_cents
-        BOOLEAN is_active
         TEXT status
-        INT location_start_id FK
-        INT location_end_id FK
         TIMESTAMPTZ created_at
         TIMESTAMPTZ updated_at
     }
@@ -170,7 +167,7 @@ erDiagram
 
     AVAILABILITY_SLOTS {
         SERIAL slot_id PK
-        INT user_id FK
+        INT offer_id FK
         TIMESTAMPTZ start_time
         TIMESTAMPTZ end_time
         DOUBLE latitude
@@ -189,7 +186,6 @@ erDiagram
     USERS ||--o{ TRANSACTIONS : initiates
     USERS ||--o{ DOMAIN_EVENTS : actor
     USERS ||--o{ CHAT_MESSAGES : sends
-    USERS ||--o{ AVAILABILITY_SLOTS : schedules
 
     BREEDS ||--o{ DOGS : classifies
     DOGS ||--o{ DOG_PHOTOS : has
@@ -197,9 +193,6 @@ erDiagram
     DOGS ||--o{ REVIEWS : reviewed
     DOGS ||--o{ DOMAIN_EVENTS : target
 
-    ADDRESSES ||--o{ OFFERS : start_or_end
-
-    RESERVATIONS ||--o{ OFFERS : receives
     RESERVATIONS ||--o{ PAYMENTS : paid_for
     RESERVATIONS ||--o{ REVIEWS : reviewed
     RESERVATIONS ||--o{ TRANSACTIONS : linked
@@ -207,6 +200,8 @@ erDiagram
     RESERVATIONS ||--o{ GPS_SESSIONS : tracks
     RESERVATIONS ||--|| CHATS : has_chat
 
+    OFFERS ||--o{ AVAILABILITY_SLOTS : schedules
+    OFFERS ||--|| USERS : belongs_to
     OFFERS ||--o{ PAYMENTS : triggers
 
     WALLETS ||--o{ TRANSACTIONS : logs
