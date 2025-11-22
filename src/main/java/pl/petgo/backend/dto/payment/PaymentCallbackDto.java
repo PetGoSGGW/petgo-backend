@@ -1,4 +1,7 @@
 package pl.petgo.backend.dto.payment;
 
-public class PaymentCallbackDto {
-}
+public record PaymentCallbackDto(
+        String providerRef,     // np. "pi_3..."
+        String status,          // "succeeded", "failed" itp.
+        String providerEventId
+) {}
