@@ -32,6 +32,7 @@ public class Dog {
 
     private String notes;
 
+    @Column(name = "weight_kg")
     private Double weightKg;
 
     @Column(nullable = false)

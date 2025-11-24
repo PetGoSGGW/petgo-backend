@@ -5,7 +5,5 @@ public enum TransactionType {
     PAYMENT,
     REFUND,
     PAYOUT,
-    ESCROW_HOLD,
-    ESCROW_RELEASE,
     ADJUSTMENT
 }

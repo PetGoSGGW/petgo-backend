@@ -3,36 +3,35 @@ package pl.petgo.backend.domain;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.Instant;
-import java.util.List;
 
 @Entity
-@Table(name = "offers")
+@Table(name = "availability_slots")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Offer {
+public class AvailabilitySlot {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "offer_id")
-    private Long offerId;
+    @Column(name = "slot_id")
+    private Long slotId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "walker_id", nullable = false)
-    private User walker;
+    @JoinColumn(name = "offer_id", nullable = false)
+    private Offer offer;
 
-    @Column(name = "price_cents", nullable = false)
-    private Integer priceCents;
+    @Column(name = "start_time", nullable = false)
+    private Instant startTime;
 
-    @Column(name = "description")
-    private String description;
+    @Column(name = "end_time", nullable = false)
+    private Instant endTime;
 
-    @Column(name = "is_active", nullable = false)
-    private boolean isActive = true;
+    @Column(name = "latitude", nullable = false)
+    private Double latitude;
 
-    @OneToMany(mappedBy = "offer", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<AvailabilitySlot> availabilitySlots;
+    @Column(name = "longitude", nullable = false)
+    private Double longitude;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt = Instant.now();

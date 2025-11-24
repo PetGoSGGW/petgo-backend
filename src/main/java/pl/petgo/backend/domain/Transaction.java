@@ -14,6 +14,7 @@ public class Transaction {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "transaction_id")
     private Long transactionId;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -24,29 +25,27 @@ public class Transaction {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Column(nullable = false)
+    @Column(name = "amount_cents", nullable = false)
     private Long amountCents;
 
-    @Column(nullable = false)
+    @Column(name = "balance_after_cents", nullable = false)
     private Long balanceAfterCents;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "type", nullable = false)
     private TransactionType type;
 
+    @Column(name = "description")
     private String description;
 
+    @Column(name = "provider_ref")
     private String providerRef;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "reservation_id")
     private Reservation reservation;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "escrow_id")
-    private Escrow escrow;
-
-    @Column(nullable = false, updatable = false)
+    @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt = Instant.now();
 
     @PrePersist

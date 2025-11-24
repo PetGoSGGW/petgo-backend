@@ -3,38 +3,29 @@ package pl.petgo.backend.domain;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.Instant;
+import java.util.List;
 
 @Entity
-@Table(name = "escrows")
+@Table(name = "chats")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Escrow {
+public class Chat {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long escrowId;
+    private Long chatId;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "reservation_id", nullable = false, unique = true)
     private Reservation reservation;
 
-    @Column(nullable = false)
-    private Long amountCents;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private EscrowStatus status = EscrowStatus.HELD;
-
     @Column(nullable = false, updatable = false)
-    private Instant createdAt = Instant.now();
+    private Instant createdAt;
 
-    private Instant releasedAt;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "wallet_transaction_id")
-    private Transaction walletTransaction;
+    @OneToMany(mappedBy = "chat", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ChatMessage> messages;
 
     @PrePersist
     protected void onCreate() {

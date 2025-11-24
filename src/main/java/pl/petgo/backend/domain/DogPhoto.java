@@ -14,6 +14,7 @@ public class DogPhoto {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "photo_id")
     private Long photoId;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -23,7 +24,7 @@ public class DogPhoto {
     @Column(nullable = false)
     private String url;
 
-    @Column(nullable = false, updatable = false)
+    @Column(name = "uploaded_at", nullable = false, updatable = false)
     private Instant uploadedAt = Instant.now();
 
     @PrePersist

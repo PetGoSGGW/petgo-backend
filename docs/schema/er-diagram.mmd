@@ -1,13 +1,14 @@
 erDiagram
+
     USERS {
         SERIAL user_id PK
         TEXT email
         TEXT username
         TEXT password_hash
-        TEXT role
         TEXT first_name
         TEXT last_name
         DATE date_of_birth
+        TEXT role
         BOOLEAN is_active
         TIMESTAMPTZ created_at
         TIMESTAMPTZ updated_at
@@ -43,8 +44,8 @@ erDiagram
         INT user_id FK
         TEXT label
         TEXT home_number
-        DOUBLE lat
-        DOUBLE lon
+        DOUBLE latitude
+        DOUBLE longitude
         TEXT city
         TEXT street
         TEXT zipcode
@@ -55,6 +56,7 @@ erDiagram
         SERIAL reservation_id PK
         INT dog_id FK
         INT walker_id FK
+        INT offer_id FK
         TIMESTAMPTZ scheduled_start
         TIMESTAMPTZ scheduled_end
         TEXT status
@@ -65,13 +67,9 @@ erDiagram
     OFFERS {
         SERIAL offer_id PK
         INT walker_id FK
-        INT reservation_id FK
         TEXT description
         INT price_cents
-        BOOLEAN is_active
         TEXT status
-        INT location_start_id FK
-        INT location_end_id FK
         TIMESTAMPTZ created_at
         TIMESTAMPTZ updated_at
     }
@@ -86,16 +84,6 @@ erDiagram
         TEXT status
         TEXT provider_ref
         TIMESTAMPTZ created_at
-    }
-
-    ESCROWS {
-        SERIAL escrow_id PK
-        INT reservation_id FK
-        BIGINT amount_cents
-        TEXT status
-        TIMESTAMPTZ created_at
-        TIMESTAMPTZ released_at
-        INT wallet_transaction_id FK
     }
 
     REVIEWS {
@@ -145,20 +133,59 @@ erDiagram
         TEXT description
         TEXT provider_ref
         INT reservation_id FK
-        INT escrow_id FK
+        TIMESTAMPTZ created_at
+    }
+
+    CHATS {
+        SERIAL chat_id PK
+        INT reservation_id FK
+        TIMESTAMPTZ created_at
+    }
+
+    CHAT_MESSAGES {
+        SERIAL message_id PK
+        INT chat_id FK
+        INT sender_id FK
+        TEXT content
+        TIMESTAMPTZ sent_at
+    }
+
+    GPS_SESSIONS {
+        SERIAL session_id PK
+        INT reservation_id FK
+        TIMESTAMPTZ started_at
+        TIMESTAMPTZ stopped_at
+    }
+
+    GPS_POINTS {
+        SERIAL point_id PK
+        INT session_id FK
+        DOUBLE latitude
+        DOUBLE longitude
+        TIMESTAMPTZ recorded_at
+    }
+
+    AVAILABILITY_SLOTS {
+        SERIAL slot_id PK
+        INT offer_id FK
+        TIMESTAMPTZ start_time
+        TIMESTAMPTZ end_time
+        DOUBLE latitude
+        DOUBLE longitude
         TIMESTAMPTZ created_at
     }
 
 %% Relationships
     USERS ||--o{ DOGS : owns
     USERS ||--o{ ADDRESSES : has
-    USERS ||--o{ RESERVATIONS : walks
+    USERS ||--o{ RESERVATIONS : books_or_walks
     USERS ||--o{ OFFERS : proposes
     USERS ||--o{ PAYMENTS : pays
     USERS ||--o{ REVIEWS : writes
     USERS ||--|| WALLETS : has
     USERS ||--o{ TRANSACTIONS : initiates
     USERS ||--o{ DOMAIN_EVENTS : actor
+    USERS ||--o{ CHAT_MESSAGES : sends
 
     BREEDS ||--o{ DOGS : classifies
     DOGS ||--o{ DOG_PHOTOS : has
@@ -166,21 +193,23 @@ erDiagram
     DOGS ||--o{ REVIEWS : reviewed
     DOGS ||--o{ DOMAIN_EVENTS : target
 
-    ADDRESSES ||--o{ OFFERS : start_or_end
-
-    RESERVATIONS ||--o{ OFFERS : receives
     RESERVATIONS ||--o{ PAYMENTS : paid_for
     RESERVATIONS ||--o{ REVIEWS : reviewed
-    RESERVATIONS ||--o{ ESCROWS : secured
     RESERVATIONS ||--o{ TRANSACTIONS : linked
     RESERVATIONS ||--o{ DOMAIN_EVENTS : target
+    RESERVATIONS ||--o{ GPS_SESSIONS : tracks
+    RESERVATIONS ||--|| CHATS : has_chat
 
+    OFFERS ||--o{ AVAILABILITY_SLOTS : schedules
+    OFFERS ||--|| USERS : belongs_to
     OFFERS ||--o{ PAYMENTS : triggers
 
     WALLETS ||--o{ TRANSACTIONS : logs
     WALLETS ||--o{ DOMAIN_EVENTS : target
 
-    ESCROWS ||--|| TRANSACTIONS : sourced
-
     TRANSACTIONS ||--o{ DOMAIN_EVENTS : target
     PAYMENTS ||--o{ DOMAIN_EVENTS : target
+
+    CHATS ||--o{ CHAT_MESSAGES : contains
+
+    GPS_SESSIONS ||--o{ GPS_POINTS : collects

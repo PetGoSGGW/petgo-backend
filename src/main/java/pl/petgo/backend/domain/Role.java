@@ -1,7 +1,6 @@
 package pl.petgo.backend.domain;
 
 public enum Role {
-    OWNER,
-    WALKER,
+    USER,
     ADMIN
 }

@@ -14,7 +14,12 @@ public class Reservation {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "reservation_id")
     private Long reservationId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "offer_id", nullable = false)
+    private Offer offer;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "dog_id", nullable = false)
@@ -24,19 +29,24 @@ public class Reservation {
     @JoinColumn(name = "walker_id", nullable = false)
     private User walker;
 
-    @Column(nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "owner_id", nullable = false)
+    private User owner;
+
+    @Column(name = "scheduled_start", nullable = false)
     private Instant scheduledStart;
 
-    @Column(nullable = false)
+    @Column(name = "scheduled_end", nullable = false)
     private Instant scheduledEnd;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "status", nullable = false)
     private ReservationStatus status;
 
-    @Column(nullable = false, updatable = false)
+    @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt = Instant.now();
 
+    @Column(name = "updated_at")
     private Instant updatedAt;
 
     @PrePersist
