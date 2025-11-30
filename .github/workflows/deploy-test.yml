@@ -25,7 +25,7 @@ jobs:
 
       - name: Copy JAR to deployment directory  # copy non plain jar file
         run: |
-          cp $(ls build/libs | grep -v plain | head -n 1) /home/petgo/petgo.jar
+          cp "build/libs/$(ls build/libs | grep -v plain | head -n 1)" /home/petgo/petgo.jar
           chmod 755 /home/petgo/petgo.jar
 
       - name: Restart systemd service
