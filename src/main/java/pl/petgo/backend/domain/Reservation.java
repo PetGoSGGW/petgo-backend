@@ -18,6 +18,10 @@ public class Reservation {
     private Long reservationId;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "offer_id", nullable = false)
+    private Offer offer;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "dog_id", nullable = false)
     private Dog dog;
 

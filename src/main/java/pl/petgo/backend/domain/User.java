@@ -44,14 +44,14 @@ public class User {
     @Column(name = "role", nullable = false)
     private Role role = Role.USER;
 
+    @OneToMany(mappedBy = "walker")
+    private List<Offer> offers;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
 
     @Column(name = "updated_at")
     private Instant updatedAt;
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<AvailabilitySlot> availabilitySlots;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Address> addresses;
