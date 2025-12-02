@@ -50,4 +50,26 @@ public class Review {
     protected void onCreate() {
         createdAt = Instant.now();
     }
+
+    public static Review createFromReservation(Reservation reservation, ReviewType type, Integer rating, String comment, Long authorId) {
+        ReviewBuilder builder = Review.builder()
+                .reservation(reservation)
+                .reviewType(type)
+                .rating(rating)
+                .comment(comment);
+
+        if (reservation.getOwner().getUserId().equals(authorId)) {
+            builder.subjectUser(reservation.getWalker());
+        } else {
+            builder.dog(reservation.getDog());
+        }
+
+        if (ReviewType.WALKER.equals(type)) {
+            builder.subjectUser(reservation.getWalker());
+        } else if (ReviewType.DOG.equals(type) || ReviewType.WALK.equals(type)) {
+            builder.dog(reservation.getDog());
+        }
+
+        return builder.build();
+    }
 }
