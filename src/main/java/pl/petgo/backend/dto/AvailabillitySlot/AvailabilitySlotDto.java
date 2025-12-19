@@ -1,0 +1,22 @@
+package pl.petgo.backend.dto.AvailabillitySlot;
+
+import pl.petgo.backend.domain.AvailabilitySlot;
+import java.time.Instant;
+
+public record AvailabilitySlotDto(
+        Long slotId,
+        Instant startTime,
+        Instant endTime,
+        Double latitude,
+        Double longitude
+) {
+    public static AvailabilitySlotDto fromEntity(AvailabilitySlot slot) {
+        return new AvailabilitySlotDto(
+                slot.getSlotId(),
+                slot.getStartTime(),
+                slot.getEndTime(),
+                slot.getLatitude(),
+                slot.getLongitude()
+        );
+    }
+}

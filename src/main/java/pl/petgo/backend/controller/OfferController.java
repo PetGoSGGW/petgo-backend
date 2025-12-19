@@ -10,6 +10,10 @@ import pl.petgo.backend.security.AppUserDetails;
 import pl.petgo.backend.service.OfferService;
 import pl.petgo.backend.dto.Offer.OfferDto;
 import pl.petgo.backend.dto.Offer.OfferUpdateRequest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.util.List;
@@ -59,5 +63,22 @@ public class OfferController {
         offerService.deleteOffer(offerId, userId);
 
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{offerId}")
+    public ResponseEntity<OfferDto> getOfferById(@PathVariable Long offerId) {
+        OfferDto offer = offerService.getOfferById(offerId);
+        return ResponseEntity.ok(offer);
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<Page<OfferDto>> searchOffers(
+            @RequestParam(required = false) Double lat,
+            @RequestParam(required = false) Double lon,
+            @RequestParam(required = false) Double radiusKm, // Teraz też opcjonalny
+            @PageableDefault(size = 10) Pageable pageable
+    ) {
+        Page<OfferDto> offers = offerService.searchOffers(lat, lon, radiusKm, pageable);
+        return ResponseEntity.ok(offers);
     }
 }

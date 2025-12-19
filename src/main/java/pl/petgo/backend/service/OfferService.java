@@ -10,6 +10,8 @@ import pl.petgo.backend.repository.OfferRepository;
 import pl.petgo.backend.repository.UserRepository;
 import pl.petgo.backend.dto.Offer.OfferDto;
 import pl.petgo.backend.dto.Offer.OfferUpdateRequest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -83,5 +85,27 @@ public class OfferService {
         }
 
         offerRepository.delete(offer);
+    }
+
+    @Transactional(readOnly = true)
+    public OfferDto getOfferById(Long offerId) {
+        return offerRepository.findById(offerId)
+                .map(OfferDto::fromEntity)
+                .orElseThrow(() -> new IllegalArgumentException("Offer not found with id: " + offerId));
+    }
+
+    @Transactional(readOnly = true)
+    public Page<OfferDto> searchOffers(Double lat, Double lon, Double radiusKm, Pageable pageable) {
+        if (lat == null || lon == null) {
+            return offerRepository.findAllByIsActiveTrue(pageable)
+                    .map(OfferDto::fromEntity);
+        }
+
+        if (radiusKm == null) {
+            radiusKm = 10.0;
+        }
+
+        return offerRepository.findAllActiveInRadius(lat, lon, radiusKm, pageable)
+                .map(OfferDto::fromEntity);
     }
 }

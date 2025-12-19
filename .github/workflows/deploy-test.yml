@@ -1,0 +1,38 @@
+name: Deploy to TEST
+
+on:
+  push:
+    branches:
+      - test
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Build with Gradle
+        run: |
+          ./gradlew build -x test
+
+      - name: Copy JAR to deployment directory  # copy non plain jar file
+        run: |
+          cp "build/libs/$(ls build/libs | grep -v plain | head -n 1)" /opt/petgo/petgo.jar
+          chmod 755 /opt/petgo/petgo.jar
+
+      - name: Restart systemd service
+        run: |
+          sudo systemctl daemon-reload
+          sudo systemctl restart petgo_backend.service
+
+      - name: Check service status
+        run: |
+          sudo systemctl status petgo_backend.service --no-pager
