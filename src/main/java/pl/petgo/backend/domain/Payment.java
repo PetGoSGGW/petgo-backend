@@ -17,6 +17,12 @@ public class Payment {
     @Column(name = "payment_id")
     private Long paymentId;
 
+    // PGB-14_Payment_Module
+    // Potrzebne "stripe_payment_intent_id" platnosci do Stripe
+    // Czy "provider_ref" bedzie przechowywal to samo?
+    @Column(name = "stripe_payment_intent_id")
+    private String stripePaymentIntentId;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "reservation_id", nullable = false)
     private Reservation reservation;
