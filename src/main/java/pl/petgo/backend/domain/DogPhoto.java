@@ -24,6 +24,7 @@ public class DogPhoto {
     @Column(nullable = false)
     private String url;
 
+    @Builder.Default
     @Column(name = "uploaded_at", nullable = false, updatable = false)
     private Instant uploadedAt = Instant.now();
 

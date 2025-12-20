@@ -42,6 +42,7 @@ public class Payment {
     @Column(name = "provider_ref")
     private String providerRef;
 
+    @Builder.Default
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt = Instant.now();
 

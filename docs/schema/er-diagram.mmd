@@ -175,6 +175,17 @@ erDiagram
         TIMESTAMPTZ created_at
     }
 
+    USER_REPORTS {
+        SERIAL report_id PK
+        INT reporter_id FK
+        INT reported_id FK
+        TEXT reason
+        TEXT details
+        TEXT status
+        TIMESTAMPTZ created_at
+        TIMESTAMPTZ updated_at
+    }
+
 %% Relationships
     USERS ||--o{ DOGS : owns
     USERS ||--o{ ADDRESSES : has
@@ -186,6 +197,9 @@ erDiagram
     USERS ||--o{ TRANSACTIONS : initiates
     USERS ||--o{ DOMAIN_EVENTS : actor
     USERS ||--o{ CHAT_MESSAGES : sends
+
+    USERS ||--o{ USER_REPORTS : reports
+    USERS ||--o{ USER_REPORTS : is_reported
 
     BREEDS ||--o{ DOGS : classifies
     DOGS ||--o{ DOG_PHOTOS : has
