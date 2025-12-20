@@ -5,7 +5,5 @@ public enum PaymentStatus {
     PAID,
     REFUNDED,
     FAILED,
-    // PGB-14_Payment_Module
-    // Potrzebny nowy status "CANCELED" do platnosci Stripe
     CANCELED
 }

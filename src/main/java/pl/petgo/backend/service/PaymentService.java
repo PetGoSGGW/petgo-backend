@@ -6,7 +6,7 @@ import com.stripe.model.PaymentIntent;
 import com.stripe.param.PaymentIntentCreateParams;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j; // Do logowania (opcjonalne)
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,7 +30,7 @@ public class PaymentService {
     private String stripeApiKey;
 
     @Value("${stripe.currency}")
-    private String currency; // np. "pln"
+    private String currency; // u nas: "pln"
 
     @PostConstruct
     public void init() {
@@ -39,7 +39,7 @@ public class PaymentService {
 
     @Transactional
     public PaymentResponse initPayment(PaymentRequest request) throws StripeException {
-        // 1. Pobierz rezerwację
+        // 1. Pobieranie rezerwacji
         Reservation reservation = reservationRepository.findById(request.getReservationId())
                 .orElseThrow(() -> new RuntimeException("Rezerwacja o podanym ID nie istnieje"));
 
@@ -48,7 +48,7 @@ public class PaymentService {
             throw new RuntimeException("Nie można opłacić anulowanej rezerwacji");
         }
 
-        // 3. Pobierz dane do płatności
+        // 3. Pobieranie danych do płatności
         Offer offer = reservation.getOffer();
         User payer = reservation.getOwner();
         User payee = reservation.getWalker();
@@ -72,7 +72,7 @@ public class PaymentService {
 
         PaymentIntent intent = PaymentIntent.create(params);
 
-        // 5. Zapisz płatność w bazie ze statusem PENDING
+        // 5. Zapisanie płatności w bazie ze statusem PENDING
         Payment payment = Payment.builder()
                 .stripePaymentIntentId(intent.getId())
                 .amountCents(amountCents)
