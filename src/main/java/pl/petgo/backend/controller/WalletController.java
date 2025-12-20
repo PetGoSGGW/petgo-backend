@@ -11,7 +11,7 @@ import pl.petgo.backend.service.WalletService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/wallets")
+@RequestMapping("/api/wallets")
 @RequiredArgsConstructor
 public class WalletController {
 
