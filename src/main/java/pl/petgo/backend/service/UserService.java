@@ -4,8 +4,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import pl.petgo.backend.domain.Address;
 import pl.petgo.backend.domain.User;
-import pl.petgo.backend.domain.Wallet;
-import pl.petgo.backend.dto.*;
+import pl.petgo.backend.dto.AddressResponse;
+import pl.petgo.backend.dto.CreateAddressRequest;
+import pl.petgo.backend.dto.UpdateUserRequest;
+import pl.petgo.backend.dto.UserResponse;
+import pl.petgo.backend.error.DuplicateResourceException;
 import pl.petgo.backend.repository.AddressRepository;
 import pl.petgo.backend.repository.UserRepository;
 import pl.petgo.backend.repository.WalletRepository;
@@ -27,7 +30,7 @@ public class UserService {
                 u.getUserId(),
                 u.getUsername(),
                 u.getEmail(),
-                u.getRole() != null ? u.getRole().name() : null,
+                u.getRole(),
                 u.getFirstName(),
                 u.getLastName(),
                 u.getDateOfBirth()
@@ -41,8 +44,8 @@ public class UserService {
                 a.getAddressId(),
                 a.getLabel(),
                 a.getHomeNumber(),
-                a.getLat(),
-                a.getLon(),
+                a.getLatitude(),
+                a.getLongitude(),
                 a.getCity(),
                 a.getStreet(),
                 a.getZipcode(),
@@ -56,24 +59,12 @@ public class UserService {
         a.setUser(user);
         a.setLabel(dto.label());
         a.setHomeNumber(dto.homeNumber());
-        a.setLat(dto.lat());
-        a.setLon(dto.lon());
+        a.setLatitude(dto.lat());
+        a.setLongitude(dto.lon());
         a.setCity(dto.city());
         a.setStreet(dto.street());
         a.setZipcode(dto.zipcode());
         return a;
-    }
-
-    public static WalletResponse toResponseWallet(Wallet w) {
-        if (w == null) return null;
-
-        return new WalletResponse(
-                w.getWalletId(),
-                w.getCurrency(),
-                w.getBalanceCents(),
-                w.getCreatedAt(),
-                w.getUpdatedAt()
-        );
     }
 
     public UserResponse updateUser(Long id, UpdateUserRequest updatedUserData) {
@@ -81,27 +72,23 @@ public class UserService {
                 .orElseThrow(() -> new RuntimeException("Użytkownik o ID " + id + " nie istnieje"));
 
         if (updatedUserData.username() != null) {
-            if (userRepository.existsByUsername(updatedUserData.username()))
-                throw new IllegalArgumentException("Username already used");
+            if (userRepository.existsByUsernameAndUserIdNot(updatedUserData.username(), id)) {
+                throw new DuplicateResourceException("Username already used");
+            }
             user.setUsername(updatedUserData.username());
         }
+
         if (updatedUserData.email() != null) {
-            if (userRepository.existsByEmail(updatedUserData.email()))
-                throw new IllegalArgumentException("Email already used");
+            if (userRepository.existsByEmailAndUserIdNot(updatedUserData.email(), id)) {
+                throw new DuplicateResourceException("Email already used");
+            }
             user.setEmail(updatedUserData.email());
         }
-        if (updatedUserData.firstName() != null) {
-            user.setFirstName(updatedUserData.firstName());
-        }
-        if (updatedUserData.lastName() != null) {
-            user.setLastName(updatedUserData.lastName());
-        }
-        if (updatedUserData.role() != null) {
-            user.setRole(updatedUserData.role());
-        }
-        if (updatedUserData.dateOfBirth() != null) {
-            user.setDateOfBirth(updatedUserData.dateOfBirth());
-        }
+
+        if (updatedUserData.firstName() != null) user.setFirstName(updatedUserData.firstName());
+        if (updatedUserData.lastName() != null) user.setLastName(updatedUserData.lastName());
+        if (updatedUserData.role() != null) user.setRole(updatedUserData.role());
+        if (updatedUserData.dateOfBirth() != null) user.setDateOfBirth(updatedUserData.dateOfBirth());
 
         return toResponse(userRepository.save(user));
     }
@@ -139,12 +126,4 @@ public class UserService {
 
         return toResponseAddress(saved);
     }
-
-    public WalletResponse getWalletByUser(Long userId) {
-        Wallet wallet = walletRepository.findByUserUserId(userId)
-                .orElseThrow(() -> new RuntimeException("Wallet not found"));
-
-        return toResponseWallet(wallet);
-    }
-
 }
