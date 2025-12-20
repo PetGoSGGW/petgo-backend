@@ -24,9 +24,11 @@ public class Wallet {
     @Column(name = "currency", nullable = false)
     private String currency;
 
+    @Builder.Default
     @Column(name = "balance_cents", nullable = false)
     private Long balanceCents = 0L;
 
+    @Builder.Default
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt = Instant.now();
 

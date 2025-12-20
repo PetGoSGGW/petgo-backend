@@ -37,9 +37,11 @@ public class User {
     @Column(name = "date_of_birth")
     private LocalDate dateOfBirth;
 
+    @Builder.Default
     @Column(name = "is_active", nullable = false)
     private Boolean isActive = true;
 
+    @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false)
     private Role role = Role.USER;

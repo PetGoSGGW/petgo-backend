@@ -43,6 +43,7 @@ public class Review {
     @Column(name = "comment")
     private String comment;
 
+    @Builder.Default
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt = Instant.now();
 
