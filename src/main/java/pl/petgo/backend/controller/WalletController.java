@@ -14,7 +14,7 @@ import java.util.List;
 @RequestMapping("/api/wallets")
 @RequiredArgsConstructor
 @Tag(
-    name = "Wallets module",
+    name = "Wallets Module",
     description = "Operations related to user wallets (balance, transactions, top-ups, payouts)"
 )
 public class WalletController {
