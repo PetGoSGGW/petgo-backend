@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -61,11 +62,13 @@ public class User {
     @OneToMany(mappedBy = "sender", cascade = CascadeType.ALL)
     private List<ChatMessage> sentMessages;
 
+    @Builder.Default
     @OneToMany(mappedBy = "reporter")
-    private List<UserReport> reportsMade;
+    private List<UserReport> reportsMade = new ArrayList<>();
 
+    @Builder.Default
     @OneToMany(mappedBy = "reported")
-    private List<UserReport> reportsReceived;
+    private List<UserReport> reportsReceived = new ArrayList<>();
 
     @PrePersist
     protected void onCreate() {
