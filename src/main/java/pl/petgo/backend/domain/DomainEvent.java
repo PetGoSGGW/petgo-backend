@@ -55,6 +55,7 @@ public class DomainEvent {
     @Column(name = "metadata_json", columnDefinition = "TEXT")
     private String metadataJson;
 
+    @Builder.Default
     @Column(name = "occurred_at", nullable = false, updatable = false)
     private Instant occurredAt = Instant.now();
 
