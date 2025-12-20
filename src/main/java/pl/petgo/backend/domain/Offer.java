@@ -28,12 +28,14 @@ public class Offer {
     @Column(name = "description")
     private String description;
 
+    @Builder.Default
     @Column(name = "is_active", nullable = false)
     private boolean isActive = true;
 
     @OneToMany(mappedBy = "offer", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<AvailabilitySlot> availabilitySlots;
 
+    @Builder.Default
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt = Instant.now();
 

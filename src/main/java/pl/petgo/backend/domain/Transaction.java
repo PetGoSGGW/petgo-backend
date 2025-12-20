@@ -45,6 +45,7 @@ public class Transaction {
     @JoinColumn(name = "reservation_id")
     private Reservation reservation;
 
+    @Builder.Default
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt = Instant.now();
 

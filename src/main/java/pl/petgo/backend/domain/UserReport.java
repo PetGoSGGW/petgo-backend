@@ -31,10 +31,12 @@ public class UserReport {
     @Column(name = "details")
     private String details;
 
+    @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     private ReportStatus status = ReportStatus.PENDING;
 
+    @Builder.Default
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt = Instant.now();
 
