@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class SampleController {
-    @GetMapping("/api")
+    @GetMapping("/api/hello")
     public String sampleText(){
         return "Hello from Petgo API!";
     }

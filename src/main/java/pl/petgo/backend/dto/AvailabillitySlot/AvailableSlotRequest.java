@@ -1,4 +1,4 @@
-package pl.petgo.backend.dto;
+package pl.petgo.backend.dto.AvailabillitySlot;
 
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotNull;
