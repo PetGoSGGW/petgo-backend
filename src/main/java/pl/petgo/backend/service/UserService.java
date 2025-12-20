@@ -28,7 +28,7 @@ public class UserService {
                 u.getUserId(),
                 u.getUsername(),
                 u.getEmail(),
-                u.getRole() != null ? u.getRole().name() : null,
+                u.getRole(),
                 u.getFirstName(),
                 u.getLastName(),
                 u.getDateOfBirth()
@@ -42,8 +42,8 @@ public class UserService {
                 a.getAddressId(),
                 a.getLabel(),
                 a.getHomeNumber(),
-                a.getLat(),
-                a.getLon(),
+                a.getLatitude(),
+                a.getLongitude(),
                 a.getCity(),
                 a.getStreet(),
                 a.getZipcode(),
@@ -57,8 +57,8 @@ public class UserService {
         a.setUser(user);
         a.setLabel(dto.label());
         a.setHomeNumber(dto.homeNumber());
-        a.setLat(dto.lat());
-        a.setLon(dto.lon());
+        a.setLatitude(dto.lat());
+        a.setLongitude(dto.lon());
         a.setCity(dto.city());
         a.setStreet(dto.street());
         a.setZipcode(dto.zipcode());
@@ -83,7 +83,6 @@ public class UserService {
                 .orElseThrow(() -> new RuntimeException("Użytkownik o ID " + id + " nie istnieje"));
 
         if (updatedUserData.username() != null) {
-            // kolizja, ale pomijamy bieżący rekord
             if (userRepository.existsByUsernameAndUserIdNot(updatedUserData.username(), id)) {
                 throw new DuplicateResourceException("Username already used");
             }
