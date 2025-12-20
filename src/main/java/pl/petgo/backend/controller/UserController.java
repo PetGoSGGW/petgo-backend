@@ -15,28 +15,23 @@ import java.net.URI;
 import java.util.List;
 
 @RestController
-@RequestMapping(value = "/api/v1/users", produces = "application/json")
+@RequestMapping(value = "/api/users")
 @RequiredArgsConstructor
 @Validated
 public class UserController {
     private final UserService users;
 
-    // GET /api/v1/users
     @GetMapping
-    //@PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<UserResponse>> getUsers(@AuthenticationPrincipal AppUserDetails principal) {
         return ResponseEntity.ok(users.findAll());
     }
 
-    // GET /api/v1/users/{id}
     @GetMapping("/{id}")
-    //@PreAuthorize("hasRole('ADMIN') or #id == principal.userId")
     public ResponseEntity<UserResponse> getUser(@AuthenticationPrincipal AppUserDetails principal,
                                                 @PathVariable Long id) {
         return ResponseEntity.ok(users.findById(id));
     }
 
-    // GET /api/v1/users/{id}/addresses
     @GetMapping("/{id}/addresses")
     @PreAuthorize("hasRole('ADMIN') or #id == principal.userId")
     public ResponseEntity<List<AddressResponse>> getAddresses(@AuthenticationPrincipal AppUserDetails principal,
@@ -44,7 +39,6 @@ public class UserController {
         return ResponseEntity.ok(users.getAddressesForUser(id));
     }
 
-    // GET /api/v1/users/{id}/wallet
     @GetMapping("/{id}/wallet")
     @PreAuthorize("hasRole('ADMIN') or #id == principal.userId")
     public ResponseEntity<WalletResponse> getWallet(@AuthenticationPrincipal AppUserDetails principal,
@@ -52,7 +46,6 @@ public class UserController {
         return ResponseEntity.ok(users.getWalletByUser(id));
     }
 
-    // POST /api/v1/users/{id}/addresses
     @PostMapping(value = "/{id}/addresses", consumes = "application/json")
     @PreAuthorize("hasRole('ADMIN') or #id == principal.userId")
     public ResponseEntity<AddressResponse> addAddress(@AuthenticationPrincipal AppUserDetails principal,
@@ -63,7 +56,6 @@ public class UserController {
         return ResponseEntity.created(location).body(created);
     }
 
-    // PATCH /api/v1/users/{id}
     @PatchMapping(value = "/{id}", consumes = "application/json")
     @PreAuthorize("hasRole('ADMIN') or #id == principal.userId")
     public ResponseEntity<UserResponse> changeUser(@AuthenticationPrincipal AppUserDetails principal,
