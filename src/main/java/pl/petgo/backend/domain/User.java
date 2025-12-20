@@ -59,6 +59,12 @@ public class User {
     @OneToMany(mappedBy = "sender", cascade = CascadeType.ALL)
     private List<ChatMessage> sentMessages;
 
+    @OneToMany(mappedBy = "reporter")
+    private List<UserReport> reportsMade;
+
+    @OneToMany(mappedBy = "reported")
+    private List<UserReport> reportsReceived;
+
     @PrePersist
     protected void onCreate() {
         createdAt = Instant.now();
