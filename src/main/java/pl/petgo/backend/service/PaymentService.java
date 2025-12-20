@@ -30,7 +30,7 @@ public class PaymentService {
     private String stripeApiKey;
 
     @Value("${stripe.currency}")
-    private String currency; // u nas: "pln"
+    private String currency;
 
     @PostConstruct
     public void init() {
@@ -39,24 +39,19 @@ public class PaymentService {
 
     @Transactional
     public PaymentResponse initPayment(PaymentRequest request) throws StripeException {
-        // 1. Pobieranie rezerwacji
         Reservation reservation = reservationRepository.findById(request.getReservationId())
                 .orElseThrow(() -> new RuntimeException("Rezerwacja o podanym ID nie istnieje"));
-
-        // 2. Walidacja
+        
         if (reservation.getStatus() == ReservationStatus.CANCELLED) {
             throw new RuntimeException("Nie można opłacić anulowanej rezerwacji");
         }
 
-        // 3. Pobieranie danych do płatności
         Offer offer = reservation.getOffer();
         User payer = reservation.getOwner();
         User payee = reservation.getWalker();
 
-        // Rzutowanie Integer (Offer) na Long (Stripe/Payment)
         Long amountCents = Long.valueOf(offer.getPriceCents());
 
-        // 4. Tworzenie PaymentIntent w Stripe
         PaymentIntentCreateParams params = PaymentIntentCreateParams.builder()
                 .setAmount(amountCents)
                 .setCurrency(currency)
@@ -64,15 +59,13 @@ public class PaymentService {
                         PaymentIntentCreateParams.AutomaticPaymentMethods.builder().setEnabled(true).build()
                 )
                 .setDescription("Oplata za spacer: " + reservation.getReservationId())
-                .setReceiptEmail(payer.getEmail()) // Stripe wyśle potwierdzenie na maila (w trybie live)
-                // Metadane kluczowe dla Webhooka
+                .setReceiptEmail(payer.getEmail())
                 .putMetadata("reservationId", reservation.getReservationId().toString())
                 .putMetadata("userId", payer.getUserId().toString())
                 .build();
 
         PaymentIntent intent = PaymentIntent.create(params);
 
-        // 5. Zapisanie płatności w bazie ze statusem PENDING
         Payment payment = Payment.builder()
                 .stripePaymentIntentId(intent.getId())
                 .amountCents(amountCents)
@@ -86,7 +79,7 @@ public class PaymentService {
 
         paymentRepository.save(payment);
 
-        log.info("Zainicjowano płatność ID: {} dla rezerwacji: {}", payment.getPaymentId(), reservation.getReservationId());
+        log.info("Payment initiated ID: {} for reservation: {}", payment.getPaymentId(), reservation.getReservationId());
 
         return new PaymentResponse(intent.getClientSecret(), payment.getPaymentId());
     }
