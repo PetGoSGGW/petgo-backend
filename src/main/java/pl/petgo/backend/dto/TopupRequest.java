@@ -1,4 +1,4 @@
-package pl.petgo.backend.dto.wallet;
+package pl.petgo.backend.dto;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
