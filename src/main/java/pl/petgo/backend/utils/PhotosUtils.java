@@ -21,6 +21,8 @@ import static java.util.UUID.randomUUID;
 @Slf4j
 public class PhotosUtils {
 
+    private static final String FILE_PREFIX_URL = "/photos/dogs/";
+
     public DogPhoto saveSinglePhoto(MultipartFile file, Dog dog, Path uploadDir) {
         var originalFilename = file.getOriginalFilename();
         var extension = "";
@@ -38,9 +40,11 @@ public class PhotosUtils {
             throw new FileStorageException("Failed to save file " + fileName, e);
         }
 
+        var relativePath = FILE_PREFIX_URL + dog.getDogId() + "/" + fileName;
+
         return DogPhoto.builder()
                 .dog(dog)
-                .url(filePath.toString())
+                .url(relativePath)
                 .build();
     }
 

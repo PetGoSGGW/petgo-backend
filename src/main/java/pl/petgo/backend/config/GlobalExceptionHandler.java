@@ -1,8 +1,8 @@
 package pl.petgo.backend.config;
 
-import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import pl.petgo.backend.dto.ErrorDetails;
 import pl.petgo.backend.exception.FileStorageException;
+import pl.petgo.backend.exception.NotFoundException;
 
 import java.util.HashMap;
 
@@ -18,14 +19,14 @@ import static org.springframework.http.HttpStatus.*;
 @RestControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler {
-
     private static final String VALIDATION_ERROR_MESSAGE = "Validation failed for some fields!";
     private static final String FILE_TO_LARGE_ERROR_MESSAGE = "Uploaded file is too large!";
     private static final String FILE_STORAGE_ERROR_MESSAGE = "Error with file storage occurred. Please try again later!";
+    private static final String ACCESS_DENIED_ERROR_MESSAGE = "You do not have permission to access this resource!";
     private static final String INTERNAL_SERVER_ERROR_MESSAGE = "An unexpected internal error occurred!";
 
-    @ExceptionHandler(EntityNotFoundException.class)
-    public ResponseEntity<ErrorDetails> handleEntityNotFound(EntityNotFoundException ex) {
+    @ExceptionHandler(NotFoundException.class)
+    public ResponseEntity<ErrorDetails> handleEntityNotFound(NotFoundException ex) {
         log.warn("Resource not found: {}", ex.getMessage());
 
         var errorDetails = new ErrorDetails(
@@ -95,6 +96,19 @@ public class GlobalExceptionHandler {
         );
 
         return new ResponseEntity<>(errorDetails, PAYLOAD_TOO_LARGE);
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ErrorDetails> handleAccessDeniedException(AccessDeniedException ex) {
+        log.warn("Access denied: {}", ex.getMessage());
+
+        var errorDetails = new ErrorDetails(
+                FORBIDDEN.value(),
+                FORBIDDEN.getReasonPhrase(),
+                ACCESS_DENIED_ERROR_MESSAGE
+        );
+
+        return new ResponseEntity<>(errorDetails, FORBIDDEN);
     }
 
     @ExceptionHandler(Exception.class)

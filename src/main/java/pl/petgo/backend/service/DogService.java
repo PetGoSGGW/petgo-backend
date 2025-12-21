@@ -6,6 +6,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import pl.petgo.backend.domain.Breed;
@@ -21,6 +22,7 @@ import pl.petgo.backend.repository.DogPhotoRepository;
 import pl.petgo.backend.repository.DogRepository;
 import pl.petgo.backend.repository.UserRepository;
 import pl.petgo.backend.utils.PhotosUtils;
+import pl.petgo.backend.utils.SecurityUtils;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -64,8 +66,8 @@ public class DogService {
     public DogDto addDog(DogCreateRequestDto dogCreateRequestDto) {
         var dog = dogMapper.toEntity(dogCreateRequestDto);
 
-        var owner = userRepository.findById(dogCreateRequestDto.ownerId())
-                .orElseThrow(() -> new NotFoundException("Owner not found with id: " + dogCreateRequestDto.ownerId()));
+        var owner = userRepository.findByEmail(SecurityUtils.getUserEmail())
+                .orElseThrow(() -> new NotFoundException("Owner not found: " + SecurityUtils.getUserEmail()));
 
         var breed = (Breed) breedRepository.findByBreedCode(dogCreateRequestDto.breedCode())
                 .orElseThrow(() -> new NotFoundException("Breed not found with code: " + dogCreateRequestDto.breedCode()));
@@ -77,11 +79,14 @@ public class DogService {
         return dogMapper.toDto(savedDog);
     }
 
-    //todo: add checking if this is user operation - get user data from JWT token
     @Transactional
     public DogDto updateDog(Long id, DogUpdateRequestDto dogUpdateRequestDto) {
         var dog = dogRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Dog not found with id: " + id));
+
+        if (!dog.getOwner().getEmail().equals(SecurityUtils.getUserEmail()) && !SecurityUtils.isAdmin()) {
+            throw new AccessDeniedException("Access denied!");
+        }
 
         dogMapper.updateEntityFromDto(dogUpdateRequestDto, dog);
 
@@ -95,11 +100,14 @@ public class DogService {
         return dogMapper.toDto(updatedDog);
     }
 
-    //todo: add checking if this is user operation - get user data from JWT token
     @Transactional
     public void deleteDog(Long id) {
         var dog = dogRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Dog not found with id: " + id));
+
+        if (!dog.getOwner().getEmail().equals(SecurityUtils.getUserEmail()) && !SecurityUtils.isAdmin()) {
+            throw new AccessDeniedException("Access denied!");
+        }
 
         dogRepository.delete(dog);
 
@@ -128,6 +136,10 @@ public class DogService {
         var dog = dogRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Dog not found with id: " + id));
 
+        if (!dog.getOwner().getEmail().equals(SecurityUtils.getUserEmail()) && !SecurityUtils.isAdmin()) {
+            throw new AccessDeniedException("Access denied!");
+        }
+
         var uploadDir = get(baseUploadDir, "dogs", valueOf(id));
 
         try {
@@ -151,12 +163,14 @@ public class DogService {
                 .toList();
     }
 
-    //todo: add checking if this is user operation - get user data from JWT token
     @Transactional
     public void deleteDogPhoto(Long id, Long photoId) {
-
         var photo = dogPhotoRepository.findById(photoId)
                 .orElseThrow(() -> new NotFoundException("Photo not found"));
+
+        if (!photo.getDog().getOwner().getEmail().equals(SecurityUtils.getUserEmail()) && !SecurityUtils.isAdmin()) {
+            throw new AccessDeniedException("Access denied!");
+        }
 
         if (!photo.getDog().getDogId().equals(id)) {
             throw new IllegalArgumentException("Photo does not belong to the specified dog");
