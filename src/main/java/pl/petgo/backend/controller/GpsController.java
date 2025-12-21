@@ -3,8 +3,6 @@ package pl.petgo.backend.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import pl.petgo.backend.dto.GpsPointDto;
 import pl.petgo.backend.dto.GpsPointRequest;
@@ -16,14 +14,8 @@ import java.util.List;
 @RequestMapping("/api/gps")
 @RequiredArgsConstructor
 public class GpsController {
+
     private final GpsTrackingService gpsTrackingService;
-
-    // TODO: consider removing later
-    @GetMapping
-    public ResponseEntity<String> gpsInfo() {
-        return ResponseEntity.ok("GPS Service is running");
-    }
-
 
     @PostMapping("/start/{reservationId}")
     public ResponseEntity<Long> start(@PathVariable Long reservationId) {
