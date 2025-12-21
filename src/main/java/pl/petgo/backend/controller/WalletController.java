@@ -1,5 +1,9 @@
 package pl.petgo.backend.controller;
 
+import pl.petgo.backend.dto.TransactionResponse;
+import pl.petgo.backend.dto.TopupRequest;
+import pl.petgo.backend.dto.PayoutRequest;
+
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

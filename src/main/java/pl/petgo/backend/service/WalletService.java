@@ -1,5 +1,6 @@
 package pl.petgo.backend.service;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
@@ -7,7 +8,14 @@ import org.springframework.transaction.annotation.Transactional;
 import pl.petgo.backend.domain.Transaction;
 import pl.petgo.backend.domain.TransactionType;
 import pl.petgo.backend.domain.Wallet;
+<<<<<<< HEAD
 import pl.petgo.backend.dto.*;
+=======
+import pl.petgo.backend.dto.PayoutRequest;
+import pl.petgo.backend.dto.TopupRequest;
+import pl.petgo.backend.dto.WalletResponse;
+import pl.petgo.backend.dto.TransactionResponse;
+>>>>>>> 70434ab2dbddafc2cacb9cb7e41936548d2e08b3
 import pl.petgo.backend.repository.TransactionRepository;
 import pl.petgo.backend.repository.WalletRepository;
 import pl.petgo.backend.security.CurrentUserService;
@@ -56,7 +64,11 @@ public class WalletService {
     }
 
     @Transactional
+<<<<<<< HEAD
     public pl.petgo.backend.dto.WalletResponse topup(Long walletId, pl.petgo.backend.dto.wallet.TopupRequest request) {
+=======
+    public WalletResponse topup(Long walletId, @Valid TopupRequest request) {
+>>>>>>> 70434ab2dbddafc2cacb9cb7e41936548d2e08b3
         Long currentUserId = currentUserService.getCurrentUserId();
 
         if (request.amountCents() == null || request.amountCents() <= 0) {
@@ -90,7 +102,11 @@ public class WalletService {
     }
 
     @Transactional
+<<<<<<< HEAD
     public pl.petgo.backend.dto.WalletResponse payout(Long walletId, pl.petgo.backend.dto.wallet.PayoutRequest request) {
+=======
+    public WalletResponse payout(Long walletId, @Valid PayoutRequest request) {
+>>>>>>> 70434ab2dbddafc2cacb9cb7e41936548d2e08b3
         Long currentUserId = currentUserService.getCurrentUserId();
 
         if (request.amountCents() == null || request.amountCents() <= 0) {
