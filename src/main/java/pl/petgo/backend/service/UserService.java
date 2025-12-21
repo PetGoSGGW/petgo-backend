@@ -71,15 +71,15 @@ public class UserService {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Użytkownik o ID " + id + " nie istnieje"));
 
-        if (updatedUserData.username() != null) {
-            if (userRepository.existsByUsernameAndUserIdNot(updatedUserData.username(), id)) {
+        if (updatedUserData.username() != null && !updatedUserData.username().equals(user.getUsername())) {
+            if (userRepository.existsByUsername(updatedUserData.username())){
                 throw new DuplicateResourceException("Username already used");
             }
             user.setUsername(updatedUserData.username());
         }
 
-        if (updatedUserData.email() != null) {
-            if (userRepository.existsByEmailAndUserIdNot(updatedUserData.email(), id)) {
+        if (updatedUserData.email() != null && !updatedUserData.email().equals(user.getEmail())) {
+            if (userRepository.existsByEmail(updatedUserData.email())) {
                 throw new DuplicateResourceException("Email already used");
             }
             user.setEmail(updatedUserData.email());

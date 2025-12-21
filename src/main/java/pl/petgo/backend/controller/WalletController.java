@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import pl.petgo.backend.dto.wallet.*;
+import pl.petgo.backend.dto.WalletResponse;
 import pl.petgo.backend.service.WalletService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -38,7 +38,7 @@ public class WalletController {
         summary = "Get wallet transactions",
         description = "Returns a list of all transactions associated with the given wallet"
     )
-    public ResponseEntity<List<TransactionResponse>> getTransactions(@PathVariable Long id) {
+    public ResponseEntity<List<pl.petgo.backend.dto.wallet.TransactionResponse>> getTransactions(@PathVariable Long id) {
         return ResponseEntity.ok(walletService.getTransactions(id));
     }
 
@@ -50,7 +50,7 @@ public class WalletController {
     )
     public ResponseEntity<WalletResponse> topup(
             @PathVariable Long id,
-            @Valid @RequestBody TopupRequest request
+            @Valid @RequestBody pl.petgo.backend.dto.wallet.TopupRequest request
     ) {
         return ResponseEntity.ok(walletService.topup(id, request));
     }
@@ -63,7 +63,7 @@ public class WalletController {
     )
     public ResponseEntity<WalletResponse> payout(
             @PathVariable Long id,
-            @Valid @RequestBody PayoutRequest request
+            @Valid @RequestBody pl.petgo.backend.dto.wallet.PayoutRequest request
     ) {
         return ResponseEntity.ok(walletService.payout(id, request));
     }

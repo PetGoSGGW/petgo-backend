@@ -7,7 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import pl.petgo.backend.domain.Transaction;
 import pl.petgo.backend.domain.TransactionType;
 import pl.petgo.backend.domain.Wallet;
-import pl.petgo.backend.dto.wallet.*;
+import pl.petgo.backend.dto.*;
 import pl.petgo.backend.repository.TransactionRepository;
 import pl.petgo.backend.repository.WalletRepository;
 import pl.petgo.backend.security.CurrentUserService;
@@ -24,11 +24,11 @@ public class WalletService {
     private final CurrentUserService currentUserService;
 
     @Transactional(readOnly = true)
-    public WalletResponse getWallet(Long id) {
+    public pl.petgo.backend.dto.WalletResponse getWallet(Long id) {
         Wallet wallet = walletRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Wallet not found: " + id));
 
-        return new WalletResponse(
+        return new pl.petgo.backend.dto.WalletResponse(
                 wallet.getWalletId(),
                 wallet.getUser().getUserId(),
                 wallet.getCurrency(),
@@ -39,11 +39,11 @@ public class WalletService {
     }
 
     @Transactional(readOnly = true)
-    public List<TransactionResponse> getTransactions(Long walletId) {
+    public List<pl.petgo.backend.dto.wallet.TransactionResponse> getTransactions(Long walletId) {
         return transactionRepository
                 .findByWalletWalletIdOrderByCreatedAtDesc(walletId)
                 .stream()
-                .map(tx -> new TransactionResponse(
+                .map(tx -> new pl.petgo.backend.dto.wallet.TransactionResponse(
                         tx.getTransactionId(),
                         tx.getUser().getUserId(),
                         tx.getAmountCents(),
@@ -56,7 +56,7 @@ public class WalletService {
     }
 
     @Transactional
-    public WalletResponse topup(Long walletId, TopupRequest request) {
+    public pl.petgo.backend.dto.WalletResponse topup(Long walletId, pl.petgo.backend.dto.wallet.TopupRequest request) {
         Long currentUserId = currentUserService.getCurrentUserId();
 
         if (request.amountCents() == null || request.amountCents() <= 0) {
@@ -90,7 +90,7 @@ public class WalletService {
     }
 
     @Transactional
-    public WalletResponse payout(Long walletId, PayoutRequest request) {
+    public pl.petgo.backend.dto.WalletResponse payout(Long walletId, pl.petgo.backend.dto.wallet.PayoutRequest request) {
         Long currentUserId = currentUserService.getCurrentUserId();
 
         if (request.amountCents() == null || request.amountCents() <= 0) {
