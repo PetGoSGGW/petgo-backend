@@ -1,5 +1,6 @@
 package pl.petgo.backend.controller;
 
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import pl.petgo.backend.dto.TransactionResponse;
 import pl.petgo.backend.dto.TopupRequest;
 import pl.petgo.backend.dto.PayoutRequest;
@@ -10,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import pl.petgo.backend.dto.WalletResponse;
+import pl.petgo.backend.security.AppUserDetails;
 import pl.petgo.backend.service.WalletService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -53,10 +55,13 @@ public class WalletController {
         description = "Increases the wallet balance by the specified amount"
     )
     public ResponseEntity<WalletResponse> topup(
+            @AuthenticationPrincipal AppUserDetails principal,
             @PathVariable Long id,
             @Valid @RequestBody pl.petgo.backend.dto.wallet.TopupRequest request
     ) {
-        return ResponseEntity.ok(walletService.topup(id, request));
+        Long userId = principal.getUser().getUserId();
+
+        return ResponseEntity.ok(walletService.topup(id, request, userId));
     }
 
     @PostMapping("/{id}/payout")
@@ -66,10 +71,13 @@ public class WalletController {
         description = "Decreases the wallet balance by the specified amount and records a payout transaction"
     )
     public ResponseEntity<WalletResponse> payout(
+            @AuthenticationPrincipal AppUserDetails principal,
             @PathVariable Long id,
             @Valid @RequestBody pl.petgo.backend.dto.wallet.PayoutRequest request
     ) {
-        return ResponseEntity.ok(walletService.payout(id, request));
+        Long userId = principal.getUser().getUserId();
+
+        return ResponseEntity.ok(walletService.payout(id, request, userId));
     }
 }
 
