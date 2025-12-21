@@ -22,7 +22,7 @@ public class RestExceptionHandler {
                 .stream()
                 .map(err -> err.getField() + ": " + err.getDefaultMessage())
                 .findFirst()
-                .orElse("Niepoprawne dane");
+                .orElse("Incorrect data");
 
         return ResponseEntity
                 .badRequest()
@@ -57,7 +57,7 @@ public class RestExceptionHandler {
                         Instant.now(),
                         409,
                         "Conflict",
-                        "Zasób już istnieje"
+                        "Resource already exists"
                 ));
     }
 }

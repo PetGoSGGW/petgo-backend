@@ -15,7 +15,7 @@ import pl.petgo.backend.dto.User.*;
 import java.util.List;
 @RequiredArgsConstructor
 @Tag(
-        name = "Users",
+        name = "Users Module",
         description = "Operations related to application users"
 )
 @RestController
@@ -25,7 +25,7 @@ public class UserController {
 
     @Operation(
             summary = "Get all users",
-            description = "Returns a list of all users. доступ restricted to administrators only."
+            description = "Returns a list of all users."
     )
     @GetMapping("/")
     public ResponseEntity<List<UserResponse>> getUsers(@AuthenticationPrincipal AppUserDetails principal) {
@@ -34,7 +34,7 @@ public class UserController {
 
     @Operation(
             summary = "Get user by ID",
-            description = "Returns user details. Accessible by administrators or the account owner."
+            description = "Returns user details."
     )
     @GetMapping("/{id}")
     public ResponseEntity<UserResponse> getUser(@AuthenticationPrincipal AppUserDetails principal, @PathVariable Long id) {

@@ -66,7 +66,7 @@ public class UserService {
 
     public UserResponse updateUser(Long id, UpdateUserRequest updatedUserData) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Użytkownik o ID " + id + " nie istnieje"));
+                .orElseThrow(() -> new RuntimeException("User with" + id + "  does not exits"));
 
         if (updatedUserData.username() != null && !updatedUserData.username().equals(user.getUsername())) {
             if (userRepository.existsByUsername(updatedUserData.username())){
