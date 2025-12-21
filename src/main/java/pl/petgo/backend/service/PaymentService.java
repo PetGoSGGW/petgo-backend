@@ -40,10 +40,10 @@ public class PaymentService {
     @Transactional
     public PaymentResponse initPayment(PaymentRequest request) throws StripeException {
         Reservation reservation = reservationRepository.findById(request.getReservationId())
-                .orElseThrow(() -> new RuntimeException("Rezerwacja o podanym ID nie istnieje"));
+                .orElseThrow(() -> new RuntimeException("Reservation with this ID does not exist"));
         
         if (reservation.getStatus() == ReservationStatus.CANCELLED) {
-            throw new RuntimeException("Nie można opłacić anulowanej rezerwacji");
+            throw new RuntimeException("Cannot pay for canceled reservation");
         }
 
         Offer offer = reservation.getOffer();

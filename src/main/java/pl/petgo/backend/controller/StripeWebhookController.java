@@ -39,46 +39,41 @@ public class StripeWebhookController {
         Event event;
 
         try {
-            // 1. Weryfikacja podpisu -  czy to na pewno Stripe
             event = Webhook.constructEvent(payload, sigHeader, endpointSecret);
         } catch (SignatureVerificationException e) {
-            log.error("Nieprawidłowy podpis Webhooka Stripe");
+            log.error("Invalid Stripe signature");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid signature");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid payload");
         }
 
-        // 2. Obsługa konkretnych zdarzeń
         if ("payment_intent.succeeded".equals(event.getType())) {
-            // Deserializacja obiektu Stripe
             PaymentIntent paymentIntent = (PaymentIntent) event.getDataObjectDeserializer().getObject().orElse(null);
 
             if (paymentIntent != null) {
-                log.info("Płatność udana: " + paymentIntent.getId());
+                log.info("Payment succeeded: " + paymentIntent.getId());
                 handlePaymentSuccess(paymentIntent);
             }
         } else if ("payment_intent.payment_failed".equals(event.getType())) {
             PaymentIntent paymentIntent = (PaymentIntent) event.getDataObjectDeserializer().getObject().orElse(null);
             if (paymentIntent != null) {
-                log.info("Płatność nieudana: " + paymentIntent.getId());
+                log.info("Payment failed: " + paymentIntent.getId());
                 handlePaymentFailure(paymentIntent);
             }
         }
-
         return ResponseEntity.ok("Received");
     }
 
     private void handlePaymentSuccess(PaymentIntent paymentIntent) {
-        // Znajdź płatność w bazie po ID ze Stripe
         paymentRepository.findByStripePaymentIntentId(paymentIntent.getId())
                 .ifPresent(payment -> {
                     payment.setStatus(PaymentStatus.PAID);
                     paymentRepository.save(payment);
 
-                    // TODO: Integracja platnosci z rezerwacjami i portfelem:
-                    // 1. Zmiana statusu Rezerwacji na CONFIRMED
-                    // 2. Doładowanie portfela (Wallet) wyprowadzacza
-                    log.info("Zaktualizowano status płatności {} na PAID", payment.getPaymentId());
+                    // TODO: Integration with Wallet and Reservations:
+                    // 1. Change Reservation status to CONFIRMED
+                    // 2. Transfer money data to walker's wallet
+                    log.info("Payment ({}) status updated to: PAID", payment.getPaymentId());
                 });
     }
 
@@ -87,7 +82,7 @@ public class StripeWebhookController {
                 .ifPresent(payment -> {
                     payment.setStatus(PaymentStatus.FAILED);
                     paymentRepository.save(payment);
-                    log.info("Zaktualizowano status płatności {} na FAILED", payment.getPaymentId());
+                    log.info("Payment ({}) status updated to: FAILED", payment.getPaymentId());
                 });
     }
 }
