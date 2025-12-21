@@ -47,8 +47,8 @@ public class User {
     @Column(name = "role", nullable = false)
     private Role role = Role.USER;
 
-    @OneToMany(mappedBy = "walker")
-    private List<Offer> offers;
+    @OneToOne(mappedBy = "walker", cascade = CascadeType.ALL)
+    private Offer offer;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
