@@ -1,4 +1,4 @@
-package pl.petgo.backend.dto.wallet;
+package pl.petgo.backend.dto;
 
 import java.time.Instant;
 
