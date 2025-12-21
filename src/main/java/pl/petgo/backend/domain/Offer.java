@@ -18,7 +18,7 @@ public class Offer {
     @Column(name = "offer_id")
     private Long offerId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "walker_id", nullable = false)
     private User walker;
 
