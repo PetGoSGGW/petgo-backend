@@ -3,6 +3,7 @@ package pl.petgo.backend.dto.review;
 import pl.petgo.backend.domain.Review;
 import pl.petgo.backend.domain.ReviewType;
 import pl.petgo.backend.domain.User;
+import pl.petgo.backend.dto.user.BasicUserInfoDto;
 import pl.petgo.backend.exception.DtoBuildException;
 import pl.petgo.backend.utils.CollectionUtil;
 
@@ -11,7 +12,7 @@ import java.util.Optional;
 
 public class ReviewWalkerDTO extends ReviewAbstractDTO {
 
-    public final String walkerFullName; //TODO replace by UserDTO in future
+    public final BasicUserInfoDto walkerInfoDto;
 
     public static ReviewWalkerDTO getReviewWalkerDTO(List<Review> reviews) throws DtoBuildException {
         Optional<User> walkerOptional = reviews.stream()
@@ -22,20 +23,18 @@ public class ReviewWalkerDTO extends ReviewAbstractDTO {
             throw new DtoBuildException();
         }
 
-        User walker = walkerOptional.get();
-        String walkerFullName = walker.getFirstName() + " " + walker.getLastName();
-        return new ReviewWalkerDTO(walkerFullName, reviews);
+        return new ReviewWalkerDTO(walkerOptional.get(), reviews);
     }
 
 
-    private ReviewWalkerDTO(String walkerFullName, List<Review> reviewList) {
+    private ReviewWalkerDTO(User walker, List<Review> reviewList) {
         super(reviewList, ReviewType.WALKER);
-        this.walkerFullName = walkerFullName;
+        this.walkerInfoDto = BasicUserInfoDto.from(walker);
     }
 
 
-    public String getWalkerDTO() {
-        return this.walkerFullName;
+    public BasicUserInfoDto getWalkerDTO() {
+        return this.walkerInfoDto;
     }
 
 }

@@ -21,7 +21,7 @@ public class SseEmitterRepository  {
     public void remove(Long userId) {
         if (userId != null){
             userEmitterMap.remove(userId);
-            log.debug("Usunięto emitter dla użytkownika {}", userId);
+            log.debug("Removed emitter for user {}", userId);
         }
     }
 

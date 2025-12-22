@@ -46,7 +46,7 @@ public class ReviewService {
     @Transactional
     public Long addReview(Long reviewerId, CreateReviewRequest request) {
         Reservation reservation = reservationRepository.findById(request.reservationId())
-                .orElseThrow(() -> new EntityNotFoundException(String.format("Rezerwacja o wskazanym Id %s nie istnieje", request.reservationId())));
+                .orElseThrow(() -> new EntityNotFoundException(String.format("Reservation with the specified ID %s does not exist", request.reservationId())));
 
         if (!ReservationStatus.COMPLETED.equals(reservation.getStatus())) {
             throw new IllegalStateException("Cannot review an incomplete reservation");

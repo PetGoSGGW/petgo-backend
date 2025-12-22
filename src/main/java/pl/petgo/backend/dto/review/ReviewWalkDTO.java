@@ -4,6 +4,8 @@ import pl.petgo.backend.domain.Dog;
 import pl.petgo.backend.domain.Review;
 import pl.petgo.backend.domain.ReviewType;
 import pl.petgo.backend.domain.User;
+import pl.petgo.backend.dto.dog.BasicDogInfoDto;
+import pl.petgo.backend.dto.user.BasicUserInfoDto;
 import pl.petgo.backend.exception.DtoBuildException;
 import pl.petgo.backend.utils.CollectionUtil;
 
@@ -12,8 +14,8 @@ import java.util.Optional;
 
 public class ReviewWalkDTO extends ReviewAbstractDTO{
 
-    public final String walkerFullName; //TODO replace by UserDTO in future
-    public final String dogName; //TODO replace by DogDTO in future
+    public final BasicUserInfoDto walkerInfoDto;
+    public final BasicDogInfoDto dogInfoDto;
 
     public static ReviewWalkDTO getReviewWalkDTO(List<Review> reviews) throws DtoBuildException {
         Optional<Dog> dogOptional = reviews.stream()
@@ -30,15 +32,13 @@ public class ReviewWalkDTO extends ReviewAbstractDTO{
             throw new DtoBuildException();
         }
 
-        String dogName = dogOptional.get().getName();
-        User walker = walkerOptional.get();
-        String walkerFullName = walker.getFirstName() + " " + walker.getLastName();
-        return new ReviewWalkDTO(dogName, walkerFullName, reviews);
+        return new ReviewWalkDTO(dogOptional.get(), walkerOptional.get(), reviews);
     }
 
-    private ReviewWalkDTO(String dogName, String walkerFullName, List<Review> reviews) {
+    private ReviewWalkDTO(Dog dog, User walker, List<Review> reviews) {
         super(reviews, ReviewType.WALK);
-        this.dogName = dogName;
-        this.walkerFullName = walkerFullName;
+
+        this.dogInfoDto = BasicDogInfoDto.from(dog);
+        this.walkerInfoDto = BasicUserInfoDto.from(walker);
     }
 }

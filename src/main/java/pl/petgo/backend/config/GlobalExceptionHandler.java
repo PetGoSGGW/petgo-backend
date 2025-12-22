@@ -1,6 +1,7 @@
 package pl.petgo.backend.config;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.FieldError;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import pl.petgo.backend.dto.ErrorDetails;
+import pl.petgo.backend.exception.DtoBuildException;
 import pl.petgo.backend.exception.FileStorageException;
 import pl.petgo.backend.exception.NotFoundException;
 
@@ -122,5 +124,12 @@ public class GlobalExceptionHandler {
         );
 
         return new ResponseEntity<>(errorDetails, INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(DtoBuildException.class)
+    public ResponseEntity<String> handleDtoBuildException(DtoBuildException ex) {
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("Błąd podczas generowania recenzji");
     }
 }
