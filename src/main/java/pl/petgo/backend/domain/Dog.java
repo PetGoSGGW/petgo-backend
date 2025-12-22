@@ -35,9 +35,11 @@ public class Dog {
     @Column(name = "weight_kg")
     private Double weightKg;
 
+    @Builder.Default
     @Column(nullable = false)
     private Boolean isActive = true;
 
+    @Builder.Default
     @Column(nullable = false, updatable = false)
     private Instant createdAt = Instant.now();
 

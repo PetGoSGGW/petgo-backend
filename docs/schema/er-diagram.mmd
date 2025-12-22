@@ -1,5 +1,4 @@
 erDiagram
-
     USERS {
         SERIAL user_id PK
         TEXT email
@@ -57,6 +56,7 @@ erDiagram
         INT dog_id FK
         INT walker_id FK
         INT offer_id FK
+        INT owner_id FK
         TIMESTAMPTZ scheduled_start
         TIMESTAMPTZ scheduled_end
         TEXT status
@@ -168,6 +168,7 @@ erDiagram
     AVAILABILITY_SLOTS {
         SERIAL slot_id PK
         INT offer_id FK
+        INT reservation_id FK
         TIMESTAMPTZ start_time
         TIMESTAMPTZ end_time
         DOUBLE latitude
@@ -175,17 +176,33 @@ erDiagram
         TIMESTAMPTZ created_at
     }
 
+    USER_REPORTS {
+        SERIAL report_id PK
+        INT reporter_id FK
+        INT reported_id FK
+        TEXT reason
+        TEXT details
+        TEXT status
+        TIMESTAMPTZ created_at
+        TIMESTAMPTZ updated_at
+    }
+
 %% Relationships
     USERS ||--o{ DOGS : owns
     USERS ||--o{ ADDRESSES : has
     USERS ||--o{ RESERVATIONS : books_or_walks
-    USERS ||--o{ OFFERS : proposes
+
+    USERS ||--o| OFFERS : proposes
+
     USERS ||--o{ PAYMENTS : pays
     USERS ||--o{ REVIEWS : writes
     USERS ||--|| WALLETS : has
     USERS ||--o{ TRANSACTIONS : initiates
     USERS ||--o{ DOMAIN_EVENTS : actor
     USERS ||--o{ CHAT_MESSAGES : sends
+
+    USERS ||--o{ USER_REPORTS : reports
+    USERS ||--o{ USER_REPORTS : is_reported
 
     BREEDS ||--o{ DOGS : classifies
     DOGS ||--o{ DOG_PHOTOS : has
@@ -200,8 +217,9 @@ erDiagram
     RESERVATIONS ||--o{ GPS_SESSIONS : tracks
     RESERVATIONS ||--|| CHATS : has_chat
 
+    RESERVATIONS ||--o{ AVAILABILITY_SLOTS : occupies
+
     OFFERS ||--o{ AVAILABILITY_SLOTS : schedules
-    OFFERS ||--|| USERS : belongs_to
     OFFERS ||--o{ PAYMENTS : triggers
 
     WALLETS ||--o{ TRANSACTIONS : logs

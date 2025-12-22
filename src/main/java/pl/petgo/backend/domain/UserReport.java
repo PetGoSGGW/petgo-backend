@@ -3,37 +3,38 @@ package pl.petgo.backend.domain;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.Instant;
-import java.util.List;
 
 @Entity
-@Table(name = "offers")
+@Table(name = "user_reports")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Offer {
+public class UserReport {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "offer_id")
-    private Long offerId;
+    @Column(name = "report_id")
+    private Long reportId;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "walker_id", nullable = false)
-    private User walker;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "reporter_id", nullable = false)
+    private User reporter;
 
-    @Column(name = "price_cents", nullable = false)
-    private Integer priceCents;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "reported_id", nullable = false)
+    private User reported;
 
-    @Column(name = "description")
-    private String description;
+    @Column(name = "reason", nullable = false)
+    private String reason;
+
+    @Column(name = "details")
+    private String details;
 
     @Builder.Default
-    @Column(name = "is_active", nullable = false)
-    private boolean isActive = true;
-
-    @OneToMany(mappedBy = "offer", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<AvailabilitySlot> availabilitySlots;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    private ReportStatus status = ReportStatus.PENDING;
 
     @Builder.Default
     @Column(name = "created_at", nullable = false, updatable = false)

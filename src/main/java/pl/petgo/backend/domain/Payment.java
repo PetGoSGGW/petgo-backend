@@ -17,6 +17,9 @@ public class Payment {
     @Column(name = "payment_id")
     private Long paymentId;
 
+    @Column(name = "stripe_payment_intent_id")
+    private String stripePaymentIntentId;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "reservation_id", nullable = false)
     private Reservation reservation;
@@ -42,6 +45,7 @@ public class Payment {
     @Column(name = "provider_ref")
     private String providerRef;
 
+    @Builder.Default
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt = Instant.now();
 
