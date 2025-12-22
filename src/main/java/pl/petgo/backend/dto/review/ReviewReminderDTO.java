@@ -32,16 +32,6 @@ public class ReviewReminderDTO {
     }
 
     @Override
-    public String toString() {
-        return "ReviewReminderDTO{" +
-                "reservationId=" + reservationId +
-                ", dogName='" + dogName + '\'' +
-                ", reviewType=" + reviewType +
-                ", message='" + message + '\'' +
-                '}';
-    }
-
-    @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         ReviewReminderDTO that = (ReviewReminderDTO) o;
