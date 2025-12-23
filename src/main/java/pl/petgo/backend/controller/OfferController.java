@@ -8,15 +8,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import pl.petgo.backend.dto.Offer.OfferCreateRequest;
+import pl.petgo.backend.dto.offer.OfferCreateRequest;
 import pl.petgo.backend.security.AppUserDetails;
 import pl.petgo.backend.service.OfferService;
-import pl.petgo.backend.dto.Offer.OfferDto;
-import pl.petgo.backend.dto.Offer.OfferUpdateRequest;
+import pl.petgo.backend.dto.offer.OfferDto;
+import pl.petgo.backend.dto.offer.OfferUpdateRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.util.List;
