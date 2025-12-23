@@ -1,4 +1,4 @@
-package pl.petgo.backend.dto.Offer;
+package pl.petgo.backend.dto.offer;
 
 import pl.petgo.backend.domain.Offer;
 

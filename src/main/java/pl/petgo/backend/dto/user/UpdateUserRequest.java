@@ -1,4 +1,4 @@
-package pl.petgo.backend.dto.User;
+package pl.petgo.backend.dto.user;
 
 import pl.petgo.backend.domain.Role;
 
