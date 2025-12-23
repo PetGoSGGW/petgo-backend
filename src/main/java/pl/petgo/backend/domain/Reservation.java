@@ -52,6 +52,7 @@ public class Reservation {
     @Column(name = "updated_at")
     private Instant updatedAt;
 
+    @Builder.Default
     @OneToMany(mappedBy = "reservation", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<AvailabilitySlot> bookedSlots = new ArrayList<>();
 

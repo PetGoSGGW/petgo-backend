@@ -10,7 +10,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import pl.petgo.backend.security.AppUserDetails;
 import pl.petgo.backend.service.UserService;
-import pl.petgo.backend.dto.User.*;
+import pl.petgo.backend.dto.user.*;
 
 import java.util.List;
 @RequiredArgsConstructor

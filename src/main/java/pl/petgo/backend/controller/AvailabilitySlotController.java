@@ -8,8 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import pl.petgo.backend.dto.AvailabillitySlot.AvailableSlotRequest;
-import pl.petgo.backend.dto.AvailabillitySlot.AvailabilitySlotDto;
+import pl.petgo.backend.dto.availabilityslot.AvailableSlotRequest;
+import pl.petgo.backend.dto.availabilityslot.AvailabilitySlotDto;
 import pl.petgo.backend.security.AppUserDetails;
 import pl.petgo.backend.service.AvailabilitySlotService;
 
