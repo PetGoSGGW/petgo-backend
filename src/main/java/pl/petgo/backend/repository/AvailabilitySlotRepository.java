@@ -11,6 +11,7 @@ import java.util.List;
 public interface AvailabilitySlotRepository extends JpaRepository<AvailabilitySlot, Long> {
 
     List<AvailabilitySlot> findAllByOffer_OfferIdOrderByStartTimeAsc(Long offerId);
+    List<AvailabilitySlot> findAllByReservation_ReservationId(Long reservationId);
 
     boolean existsByOffer_OfferIdAndStartTimeBeforeAndEndTimeAfter(
             Long offerId,
