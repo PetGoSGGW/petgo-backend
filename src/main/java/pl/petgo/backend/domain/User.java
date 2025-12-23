@@ -13,6 +13,8 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@EqualsAndHashCode(exclude = {"offer"})
+@ToString(exclude = {"offer"})
 public class User {
 
     @Id
