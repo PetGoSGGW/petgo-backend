@@ -6,8 +6,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.petgo.backend.domain.AvailabilitySlot;
 import pl.petgo.backend.domain.Offer;
-import pl.petgo.backend.dto.AvailabillitySlot.AvailabilitySlotDto;
-import pl.petgo.backend.dto.AvailabillitySlot.AvailableSlotRequest;
+import pl.petgo.backend.dto.availabilityslot.AvailabilitySlotDto;
+import pl.petgo.backend.dto.availabilityslot.AvailableSlotRequest;
 import pl.petgo.backend.repository.AvailabilitySlotRepository;
 import pl.petgo.backend.repository.OfferRepository;
 

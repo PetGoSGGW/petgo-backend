@@ -1,4 +1,4 @@
-package pl.petgo.backend.dto.AvailabillitySlot;
+package pl.petgo.backend.dto.availabilityslot;
 
 import pl.petgo.backend.domain.AvailabilitySlot;
 import java.time.Instant;

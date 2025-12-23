@@ -5,11 +5,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.petgo.backend.domain.Offer;
 import pl.petgo.backend.domain.User;
-import pl.petgo.backend.dto.Offer.OfferCreateRequest;
+import pl.petgo.backend.dto.offer.OfferCreateRequest;
 import pl.petgo.backend.repository.OfferRepository;
 import pl.petgo.backend.repository.UserRepository;
-import pl.petgo.backend.dto.Offer.OfferDto;
-import pl.petgo.backend.dto.Offer.OfferUpdateRequest;
+import pl.petgo.backend.dto.offer.OfferDto;
+import pl.petgo.backend.dto.offer.OfferUpdateRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

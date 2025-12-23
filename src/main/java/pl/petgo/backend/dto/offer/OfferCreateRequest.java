@@ -1,4 +1,4 @@
-package pl.petgo.backend.dto.Offer;
+package pl.petgo.backend.dto.offer;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
