@@ -26,6 +26,9 @@ public class PaymentService {
     private final PaymentRepository paymentRepository;
     private final ReservationRepository reservationRepository;
 
+    @Value("${app.base-url}")
+    private String baseUrl;
+
     @Value("${stripe.api.key}")
     private String stripeApiKey;
 
@@ -51,9 +54,8 @@ public class PaymentService {
         User payee = reservation.getWalker();
         Long amountCents = Long.valueOf(offer.getPriceCents());
 
-        // TODO: In production, these URLs should come from configuration or match the frontend app URL, now it is mocked
-        String successUrl = "http://localhost:8080/api/payments/success-mock";
-        String cancelUrl = "http://localhost:8080/api/payments/cancel-mock";
+        String successUrl = baseUrl + "/api/payments/success-mock";
+        String cancelUrl = baseUrl + "/api/payments/cancel-mock";
 
         SessionCreateParams params = SessionCreateParams.builder()
                 .setMode(SessionCreateParams.Mode.PAYMENT)
