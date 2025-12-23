@@ -21,6 +21,10 @@ public class AvailabilitySlot {
     @JoinColumn(name = "offer_id", nullable = false)
     private Offer offer;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "reservation_id")
+    private Reservation reservation;
+
     @Column(name = "start_time", nullable = false)
     private Instant startTime;
 

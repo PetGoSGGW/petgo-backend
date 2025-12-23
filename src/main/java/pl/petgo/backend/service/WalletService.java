@@ -1,5 +1,6 @@
 package pl.petgo.backend.service;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
@@ -7,10 +8,12 @@ import org.springframework.transaction.annotation.Transactional;
 import pl.petgo.backend.domain.Transaction;
 import pl.petgo.backend.domain.TransactionType;
 import pl.petgo.backend.domain.Wallet;
-import pl.petgo.backend.dto.wallet.*;
+import pl.petgo.backend.dto.PayoutRequest;
+import pl.petgo.backend.dto.TopupRequest;
+import pl.petgo.backend.dto.WalletResponse;
+import pl.petgo.backend.dto.TransactionResponse;
 import pl.petgo.backend.repository.TransactionRepository;
 import pl.petgo.backend.repository.WalletRepository;
-import pl.petgo.backend.security.CurrentUserService;
 
 import java.time.Instant;
 import java.util.List;
@@ -18,10 +21,8 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class WalletService {
-
     private final WalletRepository walletRepository;
     private final TransactionRepository transactionRepository;
-    private final CurrentUserService currentUserService;
 
     @Transactional(readOnly = true)
     public WalletResponse getWallet(Long id) {
@@ -56,8 +57,7 @@ public class WalletService {
     }
 
     @Transactional
-    public WalletResponse topup(Long walletId, TopupRequest request) {
-        Long currentUserId = currentUserService.getCurrentUserId();
+    public WalletResponse topup(Long walletId, @Valid TopupRequest request, Long currentUserId) {
 
         if (request.amountCents() == null || request.amountCents() <= 0) {
             throw new IllegalArgumentException("Amount must be > 0");
@@ -90,8 +90,7 @@ public class WalletService {
     }
 
     @Transactional
-    public WalletResponse payout(Long walletId, PayoutRequest request) {
-        Long currentUserId = currentUserService.getCurrentUserId();
+    public WalletResponse payout(Long walletId, @Valid PayoutRequest request, Long currentUserId) {
 
         if (request.amountCents() == null || request.amountCents() <= 0) {
             throw new IllegalArgumentException("Amount must be > 0");
