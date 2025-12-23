@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import pl.petgo.backend.domain.Address;
 import pl.petgo.backend.domain.User;
-import pl.petgo.backend.dto.User.*;
+import pl.petgo.backend.dto.user.*;
 import pl.petgo.backend.exception.*;
 import pl.petgo.backend.repository.AddressRepository;
 import pl.petgo.backend.repository.UserRepository;
