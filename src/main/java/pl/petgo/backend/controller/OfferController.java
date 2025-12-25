@@ -1,110 +1,69 @@
 package pl.petgo.backend.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import pl.petgo.backend.dto.offer.OfferCreateRequest;
-import pl.petgo.backend.security.AppUserDetails;
-import pl.petgo.backend.service.OfferService;
 import pl.petgo.backend.dto.offer.OfferDto;
 import pl.petgo.backend.dto.offer.OfferUpdateRequest;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
-
-import java.net.URI;
-import java.util.List;
+import pl.petgo.backend.security.AppUserDetails;
+import pl.petgo.backend.service.OfferService;
 
 @RestController
 @RequestMapping("/api/offers")
 @RequiredArgsConstructor
-@Tag(name = "Offer Module", description = "Endpoints for managing dog walking offers, availability slots, and location-based searching.")
+@Tag(name = "Offer Module")
 public class OfferController {
 
     private final OfferService offerService;
 
-    @Operation(
-            summary = "Create a new dog walking offer",
-            description = "Allows an authenticated Dog Walker to publish a new offer. The offer includes price, description, and initial availability slots."
-    )
+    @Operation(summary = "Stwórz swoją jedyną ofertę walkera")
     @PostMapping
     public ResponseEntity<Void> createOffer(
             @Valid @RequestBody OfferCreateRequest request,
             @AuthenticationPrincipal AppUserDetails userDetails
     ) {
-        Long userId = userDetails.getUser().getUserId();
-        Long offerId = offerService.createOffer(request, userId);
-        return ResponseEntity.created(URI.create("/api/offers/" + offerId)).build();
+        offerService.createOffer(request, userDetails.getUser().getUserId());
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @Operation(
-            summary = "Get current walker's offers",
-            description = "Retrieves a list of all offers associated with the currently authenticated Dog Walker account."
-    )
+    @Operation(summary = "Pobierz moją aktualną ofertę")
     @GetMapping("/my")
-    public ResponseEntity<List<OfferDto>> getMyOffers(@AuthenticationPrincipal AppUserDetails principal) {
-        List<OfferDto> offers = offerService.getOffersForWalker(principal.getUser());
-        return ResponseEntity.ok(offers);
+    public ResponseEntity<OfferDto> getMyOffer(@AuthenticationPrincipal AppUserDetails principal) {
+        // Zmienione na zwracanie pojedynczej oferty (relacja 1:1)
+        return ResponseEntity.ok(offerService.getMyOffer(principal.getUser().getUserId()));
     }
 
-    @Operation(
-            summary = "Update an existing offer",
-            description = "Modifies the details of a specific offer. Validates if the authenticated user is the owner (walker) of the offer."
-    )
-    @PatchMapping("/{offerId}")
-    public ResponseEntity<OfferDto> updateOffer(
-            @Parameter(description = "ID of the offer to update") @PathVariable Long offerId,
+    @Operation(summary = "Aktualizuj moją ofertę")
+    @PatchMapping("/my")
+    public ResponseEntity<OfferDto> updateMyOffer(
             @Valid @RequestBody OfferUpdateRequest request,
             @AuthenticationPrincipal AppUserDetails userDetails
     ) {
-        Long userId = userDetails.getUser().getUserId();
-        OfferDto updatedOffer = offerService.updateOffer(offerId, request, userId);
-        return ResponseEntity.ok(updatedOffer);
+        return ResponseEntity.ok(offerService.updateOffer(userDetails.getUser().getUserId(), request));
     }
 
-    @Operation(
-            summary = "Delete an offer",
-            description = "Performs a deletion of the specified offer. Only the creator of the offer can perform this action."
-    )
-    @DeleteMapping("/{offerId}")
-    public ResponseEntity<Void> deleteOffer(
-            @Parameter(description = "ID of the offer to delete") @PathVariable Long offerId,
-            @AuthenticationPrincipal AppUserDetails userDetails
-    ) {
-        Long userId = userDetails.getUser().getUserId();
-        offerService.deleteOffer(offerId, userId);
-        return ResponseEntity.noContent().build();
-    }
-
-    @Operation(
-            summary = "Get offer details by ID",
-            description = "Retrieves full information about a specific offer, including the walker's profile and availability."
-    )
-    @GetMapping("/{offerId}")
-    public ResponseEntity<OfferDto> getOfferById(
-            @Parameter(description = "Unique ID of the offer") @PathVariable Long offerId
-    ) {
-        OfferDto offer = offerService.getOfferById(offerId);
-        return ResponseEntity.ok(offer);
-    }
-
-    @Operation(
-            summary = "Search for available offers",
-            description = "Search for dog walking offers using geographical filters. Supports pagination."
-    )
+    @Operation(summary = "Wyszukaj oferty (tylko aktywne i z wolnymi slotami)")
     @GetMapping("/search")
     public ResponseEntity<Page<OfferDto>> searchOffers(
-            @Parameter(description = "Latitude for proximity search") @RequestParam(required = false) Double lat,
-            @Parameter(description = "Longitude for proximity search") @RequestParam(required = false) Double lon,
-            @Parameter(description = "Search radius in kilometers") @RequestParam(required = false) Double radiusKm,
+            @RequestParam(required = false) Double lat,
+            @RequestParam(required = false) Double lon,
+            @RequestParam(required = false) Double radiusKm,
             @PageableDefault(size = 10) Pageable pageable
     ) {
-        Page<OfferDto> offers = offerService.searchOffers(lat, lon, radiusKm, pageable);
-        return ResponseEntity.ok(offers);
+        return ResponseEntity.ok(offerService.searchOffers(lat, lon, radiusKm, pageable));
+    }
+
+    @GetMapping("/{offerId}")
+    public ResponseEntity<OfferDto> getOfferById(@PathVariable Long offerId) {
+        return ResponseEntity.ok(offerService.getOfferById(offerId));
     }
 }

@@ -1,7 +1,6 @@
 package pl.petgo.backend.service;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.petgo.backend.domain.AvailabilitySlot;
@@ -16,39 +15,23 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class AvailabilitySlotService {
 
     private final AvailabilitySlotRepository slotRepository;
     private final OfferRepository offerRepository;
 
-    @Transactional(readOnly = true)
-    public List<AvailabilitySlotDto> getSlotsForOffer(Long offerId) {
-        return slotRepository.findAllByOffer_OfferIdOrderByStartTimeAsc(offerId)
-                .stream()
-                .map(AvailabilitySlotDto::fromEntity)
-                .collect(Collectors.toList());
-    }
-
     @Transactional
-    public List<AvailabilitySlotDto> addSlots(Long offerId, List<AvailableSlotRequest> requests, Long userId) {
-        Offer offer = offerRepository.findById(offerId)
-                .orElseThrow(() -> new IllegalArgumentException("Offer not found: " + offerId));
-
-        if (!offer.getWalker().getUserId().equals(userId)) {
-            throw new SecurityException("Nie masz uprawnień do zarządzania tą ofertą.");
-        }
+    public List<AvailabilitySlotDto> addSlots(List<AvailableSlotRequest> requests, Long userId) {
+        Offer offer = offerRepository.findByWalker_UserId(userId)
+                .orElseThrow(() -> new IllegalArgumentException("Najpierw stwórz ofertę!"));
 
         for (AvailableSlotRequest req : requests) {
-            if (!req.startTime().isBefore(req.endTime())) {
-                throw new IllegalArgumentException("Data rozpoczęcia musi być wcześniejsza niż data zakończenia.");
-            }
-
+            // Rzeczywista walidacja konfliktów
             boolean overlap = slotRepository.existsByOffer_OfferIdAndStartTimeBeforeAndEndTimeAfter(
-                    offerId, req.endTime(), req.startTime()
-            );
+                    offer.getOfferId(), req.endTime(), req.startTime());
+
             if (overlap) {
-                throw new IllegalArgumentException("Konflikt terminów! W podanym czasie (" + req.startTime() + ") masz już inny slot.");
+                throw new IllegalArgumentException("Konflikt terminów dla czasu: " + req.startTime());
             }
 
             AvailabilitySlot slot = AvailabilitySlot.builder()
@@ -58,20 +41,27 @@ public class AvailabilitySlotService {
                     .latitude(req.latitude())
                     .longitude(req.longitude())
                     .build();
-
             slotRepository.save(slot);
         }
-
-        return getSlotsForOffer(offerId);
+        return getSlotsForOffer(offer.getOfferId());
+    }
+    @Transactional(readOnly = true)
+    public List<AvailabilitySlotDto> getSlotsForOffer(Long offerId) {
+        return slotRepository.findAllByOffer_OfferIdOrderByStartTimeAsc(offerId)
+                .stream().map(AvailabilitySlotDto::fromEntity).collect(Collectors.toList());
     }
 
     @Transactional
     public void deleteSlot(Long slotId, Long userId) {
         AvailabilitySlot slot = slotRepository.findById(slotId)
-                .orElseThrow(() -> new IllegalArgumentException("Slot not found: " + slotId));
+                .orElseThrow(() -> new IllegalArgumentException("Slot nie istnieje."));
 
         if (!slot.getOffer().getWalker().getUserId().equals(userId)) {
-            throw new SecurityException("Nie możesz usunąć cudzego slotu.");
+            throw new SecurityException("Nie możesz usuwać cudzych slotów.");
+        }
+
+        if (slot.getReservation() != null) {
+            throw new IllegalStateException("Nie można usunąć zarezerwowanego slotu.");
         }
 
         slotRepository.delete(slot);
