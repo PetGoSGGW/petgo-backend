@@ -9,7 +9,7 @@ public record AvailabilitySlotDto(
         Instant endTime,
         Double latitude,
         Double longitude,
-        boolean isReserved // Informacja o zajętości slotu
+        boolean isReserved
 ) {
     public static AvailabilitySlotDto fromEntity(AvailabilitySlot slot) {
         return new AvailabilitySlotDto(
@@ -18,7 +18,7 @@ public record AvailabilitySlotDto(
                 slot.getEndTime(),
                 slot.getLatitude(),
                 slot.getLongitude(),
-                slot.getReservation() != null // Sprawdzenie czy istnieje powiązana rezerwacja
+                slot.getReservation() != null
         );
     }
 }

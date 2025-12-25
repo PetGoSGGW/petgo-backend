@@ -15,7 +15,7 @@ public interface OfferRepository extends JpaRepository<Offer, Long> {
     @Query("SELECT DISTINCT o FROM Offer o " +
             "JOIN o.availabilitySlots s " +
             "WHERE o.isActive = true " +
-            "AND s.reservation IS NULL " + // Slot nie może być zarezerwowany
+            "AND s.reservation IS NULL " +
             "AND (6371 * acos(cos(radians(:lat)) * cos(radians(s.latitude)) * cos(radians(s.longitude) - radians(:lon)) + sin(radians(:lat)) * sin(radians(s.latitude)))) < :radiusKm")
     Page<Offer> findAllActiveInRadius(
             @Param("lat") Double lat,

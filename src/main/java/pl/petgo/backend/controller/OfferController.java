@@ -38,7 +38,6 @@ public class OfferController {
     @Operation(summary = "Pobierz moją aktualną ofertę")
     @GetMapping("/my")
     public ResponseEntity<OfferDto> getMyOffer(@AuthenticationPrincipal AppUserDetails principal) {
-        // Zmienione na zwracanie pojedynczej oferty (relacja 1:1)
         return ResponseEntity.ok(offerService.getMyOffer(principal.getUser().getUserId()));
     }
 

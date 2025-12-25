@@ -28,7 +28,6 @@ public class AvailabilitySlotController {
             @RequestBody @Valid List<AvailableSlotRequest> requests,
             @AuthenticationPrincipal AppUserDetails userDetails
     ) {
-        // System automatycznie znajduje ofertę przypisaną do userId
         return ResponseEntity.ok(slotService.addSlots(requests, userDetails.getUser().getUserId()));
     }
 

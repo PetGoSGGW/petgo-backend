@@ -26,7 +26,6 @@ public class AvailabilitySlotService {
                 .orElseThrow(() -> new IllegalArgumentException("Najpierw stwórz ofertę!"));
 
         for (AvailableSlotRequest req : requests) {
-            // Rzeczywista walidacja konfliktów
             boolean overlap = slotRepository.existsByOffer_OfferIdAndStartTimeBeforeAndEndTimeAfter(
                     offer.getOfferId(), req.endTime(), req.startTime());
 

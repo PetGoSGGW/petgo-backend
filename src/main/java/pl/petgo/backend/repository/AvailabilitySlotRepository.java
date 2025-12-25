@@ -11,7 +11,6 @@ public interface AvailabilitySlotRepository extends JpaRepository<AvailabilitySl
 
     List<AvailabilitySlot> findAllByOffer_OfferIdOrderByStartTimeAsc(Long offerId);
 
-    // Zapytanie sprawdzające, czy nowy slot nie nachodzi na istniejący
     boolean existsByOffer_OfferIdAndStartTimeBeforeAndEndTimeAfter(
             Long offerId,
             Instant newSlotEndTime,

@@ -8,13 +8,13 @@ import java.util.stream.Collectors;
 
 public record OfferDto(
         Long offerId,
-        Long walkerId,         // ID Walkera
-        String walkerName,      // Imię i Nazwisko Walkera
+        Long walkerId,
+        String walkerName,
         Integer priceCents,
         String description,
         boolean isActive,
         Instant createdAt,
-        List<AvailabilitySlotDto> slots // Lista slotów przypisana do oferty
+        List<AvailabilitySlotDto> slots
 ) {
     public static OfferDto fromEntity(Offer offer) {
         return new OfferDto(
