@@ -43,6 +43,7 @@ public class SecurityConfig {
                             "/swagger-ui/**",
                             "/v3/api-docs/**",
                             "/v3/api-docs.yaml",
+                            "v3/swagger-config",
                             "/api/auth/register",
                             "/api/auth/login",
                             "/api/hello"
