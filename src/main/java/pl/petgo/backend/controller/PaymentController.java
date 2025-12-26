@@ -13,15 +13,14 @@ import pl.petgo.backend.service.PaymentService;
 @RestController
 @RequestMapping("/api/payments")
 @RequiredArgsConstructor
-@Tag(name = "Payments Module", description = "API for managing payment processes and Stripe integration")
+@Tag(name = "Payments", description = "API for managing payment sessions and Stripe Checkout integration")
 public class PaymentController {
 
     private final PaymentService paymentService;
 
     @Operation(
-            summary = "Initialize a new payment",
-            description = "Creates a PaymentIntent in Stripe based on the provided Reservation ID. " +
-                    "Returns a 'clientSecret' which is required by the frontend to render the Stripe payment form."
+            summary = "Initialize Stripe Checkout Session",
+            description = "Creates a Stripe Checkout Session based on Reservation ID. Returns a URL for redirection to the hosted payment page."
     )
     @PostMapping("/init")
     public ResponseEntity<PaymentResponse> initPayment(@RequestBody PaymentRequest request) {
@@ -30,6 +29,26 @@ public class PaymentController {
             return ResponseEntity.ok(response);
         } catch (StripeException e) {
             return ResponseEntity.internalServerError().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().build();
         }
+    }
+
+    @Operation(
+            summary = "Mock Success Page",
+            description = "Endpoint to redirect the user after a successful payment (for backend testing purposes only)."
+    )
+    @GetMapping("/success-mock")
+    public ResponseEntity<String> paymentSuccess() {
+        return ResponseEntity.ok("<h1>Payment Successful! You can close this window.</h1>");
+    }
+
+    @Operation(
+            summary = "Mock Cancel Page",
+            description = "Endpoint to redirect the user after a cancelled payment (for backend testing purposes only)."
+    )
+    @GetMapping("/cancel-mock")
+    public ResponseEntity<String> paymentCancel() {
+        return ResponseEntity.ok("<h1>Payment Cancelled.</h1>");
     }
 }

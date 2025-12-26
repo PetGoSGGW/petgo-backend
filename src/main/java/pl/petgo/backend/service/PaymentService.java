@@ -2,8 +2,8 @@ package pl.petgo.backend.service;
 
 import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
-import com.stripe.model.PaymentIntent;
-import com.stripe.param.PaymentIntentCreateParams;
+import com.stripe.model.checkout.Session;
+import com.stripe.param.checkout.SessionCreateParams;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +26,9 @@ public class PaymentService {
     private final PaymentRepository paymentRepository;
     private final ReservationRepository reservationRepository;
 
+    @Value("${app.base-url}")
+    private String baseUrl;
+
     @Value("${stripe.api.key}")
     private String stripeApiKey;
 
@@ -41,7 +44,7 @@ public class PaymentService {
     public PaymentResponse initPayment(PaymentRequest request) throws StripeException {
         Reservation reservation = reservationRepository.findById(request.getReservationId())
                 .orElseThrow(() -> new RuntimeException("Reservation with this ID does not exist"));
-        
+
         if (reservation.getStatus() == ReservationStatus.CANCELLED) {
             throw new RuntimeException("Cannot pay for canceled reservation");
         }
@@ -49,25 +52,47 @@ public class PaymentService {
         Offer offer = reservation.getOffer();
         User payer = reservation.getOwner();
         User payee = reservation.getWalker();
-
         Long amountCents = Long.valueOf(offer.getPriceCents());
 
-        PaymentIntentCreateParams params = PaymentIntentCreateParams.builder()
-                .setAmount(amountCents)
-                .setCurrency(currency)
-                .setAutomaticPaymentMethods(
-                        PaymentIntentCreateParams.AutomaticPaymentMethods.builder().setEnabled(true).build()
+        String successUrl = baseUrl + "/api/payments/success-mock";
+        String cancelUrl = baseUrl + "/api/payments/cancel-mock";
+
+        SessionCreateParams params = SessionCreateParams.builder()
+                .setMode(SessionCreateParams.Mode.PAYMENT)
+                .setSuccessUrl(successUrl)
+                .setCancelUrl(cancelUrl)
+                .setCustomerEmail(payer.getEmail())
+                .setClientReferenceId(reservation.getReservationId().toString())
+                .setPaymentIntentData(
+                        SessionCreateParams.PaymentIntentData.builder()
+                                .putMetadata("reservationId", reservation.getReservationId().toString())
+                                .putMetadata("userId", payer.getUserId().toString())
+                                .build()
                 )
-                .setDescription("Oplata za spacer: " + reservation.getReservationId())
-                .setReceiptEmail(payer.getEmail())
-                .putMetadata("reservationId", reservation.getReservationId().toString())
-                .putMetadata("userId", payer.getUserId().toString())
+                // IMPORTANT: item below will be displayed on Stripe hosted page
+                .addLineItem(
+                        SessionCreateParams.LineItem.builder()
+                                .setQuantity(1L)
+                                .setPriceData(
+                                        SessionCreateParams.LineItem.PriceData.builder()
+                                                .setCurrency(currency)
+                                                .setUnitAmount(amountCents)
+                                                .setProductData(
+                                                        SessionCreateParams.LineItem.PriceData.ProductData.builder()
+                                                                .setName("Dog Walk Service (Reservation #" + reservation.getReservationId() + ")")
+                                                                .setDescription(offer.getDescription())
+                                                                .build()
+                                                )
+                                                .build()
+                                )
+                                .build()
+                )
                 .build();
 
-        PaymentIntent intent = PaymentIntent.create(params);
+        Session session = Session.create(params);
 
         Payment payment = Payment.builder()
-                .stripePaymentIntentId(intent.getId())
+                .stripePaymentIntentId(session.getId())
                 .amountCents(amountCents)
                 .currency(currency)
                 .status(PaymentStatus.PENDING)
@@ -79,8 +104,8 @@ public class PaymentService {
 
         paymentRepository.save(payment);
 
-        log.info("Payment initiated ID: {} for reservation: {}", payment.getPaymentId(), reservation.getReservationId());
+        log.info("Created Stripe Checkout Session ID: {} for Reservation: {}", session.getId(), reservation.getReservationId());
 
-        return new PaymentResponse(intent.getClientSecret(), payment.getPaymentId());
+        return new PaymentResponse(session.getUrl(), session.getId());
     }
 }
