@@ -23,14 +23,14 @@ public class AvailabilitySlotService {
     @Transactional
     public List<AvailabilitySlotDto> addSlots(List<AvailableSlotRequest> requests, Long userId) {
         Offer offer = offerRepository.findByWalker_UserId(userId)
-                .orElseThrow(() -> new IllegalArgumentException("Najpierw stwórz ofertę!"));
+                .orElseThrow(() -> new IllegalArgumentException("Create an offer first!"));
 
         for (AvailableSlotRequest req : requests) {
             boolean overlap = slotRepository.existsByOffer_OfferIdAndStartTimeBeforeAndEndTimeAfter(
                     offer.getOfferId(), req.endTime(), req.startTime());
 
             if (overlap) {
-                throw new IllegalArgumentException("Konflikt terminów dla czasu: " + req.startTime());
+                throw new IllegalArgumentException("Time conflict for start time: " + req.startTime());
             }
 
             AvailabilitySlot slot = AvailabilitySlot.builder()
@@ -44,6 +44,7 @@ public class AvailabilitySlotService {
         }
         return getSlotsForOffer(offer.getOfferId());
     }
+
     @Transactional(readOnly = true)
     public List<AvailabilitySlotDto> getSlotsForOffer(Long offerId) {
         return slotRepository.findAllByOffer_OfferIdOrderByStartTimeAsc(offerId)
@@ -53,14 +54,14 @@ public class AvailabilitySlotService {
     @Transactional
     public void deleteSlot(Long slotId, Long userId) {
         AvailabilitySlot slot = slotRepository.findById(slotId)
-                .orElseThrow(() -> new IllegalArgumentException("Slot nie istnieje."));
+                .orElseThrow(() -> new IllegalArgumentException("Slot does not exist."));
 
         if (!slot.getOffer().getWalker().getUserId().equals(userId)) {
-            throw new SecurityException("Nie możesz usuwać cudzych slotów.");
+            throw new SecurityException("You cannot delete slots belonging to another user.");
         }
 
         if (slot.getReservation() != null) {
-            throw new IllegalStateException("Nie można usunąć zarezerwowanego slotu.");
+            throw new IllegalStateException("Cannot delete a reserved slot.");
         }
 
         slotRepository.delete(slot);

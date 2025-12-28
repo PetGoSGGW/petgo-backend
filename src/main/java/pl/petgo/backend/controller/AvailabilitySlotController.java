@@ -17,12 +17,12 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/slots")
 @RequiredArgsConstructor
-@Tag(name = "Availability Module")
+@Tag(name = "Availability Module", description = "Endpoints for managing dog walker availability slots")
 public class AvailabilitySlotController {
 
     private final AvailabilitySlotService slotService;
 
-    @Operation(summary = "Dodaj nowe sloty do swojej oferty")
+    @Operation(summary = "Add new availability slots to your offer")
     @PostMapping
     public ResponseEntity<List<AvailabilitySlotDto>> addSlots(
             @RequestBody @Valid List<AvailableSlotRequest> requests,
@@ -31,7 +31,7 @@ public class AvailabilitySlotController {
         return ResponseEntity.ok(slotService.addSlots(requests, userDetails.getUser().getUserId()));
     }
 
-    @Operation(summary = "Usuń slot (tylko jeśli nie jest zarezerwowany)")
+    @Operation(summary = "Delete an availability slot (only if it is not reserved)")
     @DeleteMapping("/{slotId}")
     public ResponseEntity<Void> deleteSlot(
             @PathVariable Long slotId,
@@ -41,6 +41,7 @@ public class AvailabilitySlotController {
         return ResponseEntity.noContent().build();
     }
 
+    @Operation(summary = "Get all availability slots for a specific offer")
     @GetMapping("/offer/{offerId}")
     public ResponseEntity<List<AvailabilitySlotDto>> getSlotsForOffer(@PathVariable Long offerId) {
         return ResponseEntity.ok(slotService.getSlotsForOffer(offerId));

@@ -20,12 +20,12 @@ import pl.petgo.backend.service.OfferService;
 @RestController
 @RequestMapping("/api/offers")
 @RequiredArgsConstructor
-@Tag(name = "Offer Module")
+@Tag(name = "Offer Module", description = "Endpoints for managing dog walker offers and searching")
 public class OfferController {
 
     private final OfferService offerService;
 
-    @Operation(summary = "Stwórz swoją jedyną ofertę walkera")
+    @Operation(summary = "Create your unique walker offer")
     @PostMapping
     public ResponseEntity<Void> createOffer(
             @Valid @RequestBody OfferCreateRequest request,
@@ -35,13 +35,13 @@ public class OfferController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @Operation(summary = "Pobierz moją aktualną ofertę")
+    @Operation(summary = "Retrieve current authenticated user's offer")
     @GetMapping("/my")
     public ResponseEntity<OfferDto> getMyOffer(@AuthenticationPrincipal AppUserDetails principal) {
         return ResponseEntity.ok(offerService.getMyOffer(principal.getUser().getUserId()));
     }
 
-    @Operation(summary = "Aktualizuj moją ofertę")
+    @Operation(summary = "Update current authenticated user's offer")
     @PatchMapping("/my")
     public ResponseEntity<OfferDto> updateMyOffer(
             @Valid @RequestBody OfferUpdateRequest request,
@@ -50,7 +50,7 @@ public class OfferController {
         return ResponseEntity.ok(offerService.updateOffer(userDetails.getUser().getUserId(), request));
     }
 
-    @Operation(summary = "Wyszukaj oferty (tylko aktywne i z wolnymi slotami)")
+    @Operation(summary = "Search for available offers (active with open slots only)")
     @GetMapping("/search")
     public ResponseEntity<Page<OfferDto>> searchOffers(
             @RequestParam(required = false) Double lat,
@@ -61,6 +61,7 @@ public class OfferController {
         return ResponseEntity.ok(offerService.searchOffers(lat, lon, radiusKm, pageable));
     }
 
+    @Operation(summary = "Get offer details by ID")
     @GetMapping("/{offerId}")
     public ResponseEntity<OfferDto> getOfferById(@PathVariable Long offerId) {
         return ResponseEntity.ok(offerService.getOfferById(offerId));

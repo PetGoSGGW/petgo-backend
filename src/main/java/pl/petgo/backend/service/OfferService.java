@@ -23,11 +23,11 @@ public class OfferService {
     @Transactional
     public Long createOffer(OfferCreateRequest request, Long walkerId) {
         if (offerRepository.findByWalker_UserId(walkerId).isPresent()) {
-            throw new IllegalStateException("Użytkownik już posiada ofertę.");
+            throw new IllegalStateException("User already has an offer.");
         }
 
         User walker = userRepository.findById(walkerId)
-                .orElseThrow(() -> new IllegalArgumentException("Użytkownik nie istnieje"));
+                .orElseThrow(() -> new IllegalArgumentException("User does not exist"));
 
         Offer offer = Offer.builder()
                 .walker(walker)
@@ -43,13 +43,13 @@ public class OfferService {
     public OfferDto getMyOffer(Long userId) {
         return offerRepository.findByWalker_UserId(userId)
                 .map(OfferDto::fromEntity)
-                .orElseThrow(() -> new IllegalArgumentException("Nie znaleziono Twojej oferty."));
+                .orElseThrow(() -> new IllegalArgumentException("Your offer was not found."));
     }
 
     @Transactional
     public OfferDto updateOffer(Long userId, OfferUpdateRequest request) {
         Offer offer = offerRepository.findByWalker_UserId(userId)
-                .orElseThrow(() -> new IllegalArgumentException("Oferta nie istnieje."));
+                .orElseThrow(() -> new IllegalArgumentException("Offer does not exist."));
 
         if (request.priceCents() != null) offer.setPriceCents(request.priceCents());
         if (request.description() != null) offer.setDescription(request.description());
