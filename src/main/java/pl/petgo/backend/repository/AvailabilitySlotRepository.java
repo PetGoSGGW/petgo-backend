@@ -3,7 +3,6 @@ package pl.petgo.backend.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import pl.petgo.backend.domain.AvailabilitySlot;
-
 import java.time.Instant;
 import java.util.List;
 
