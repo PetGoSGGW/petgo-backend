@@ -1,4 +1,4 @@
-package pl.petgo.backend.dto.AvailabillitySlot;
+package pl.petgo.backend.dto.availabilityslot;
 
 import pl.petgo.backend.domain.AvailabilitySlot;
 import java.time.Instant;
@@ -8,7 +8,8 @@ public record AvailabilitySlotDto(
         Instant startTime,
         Instant endTime,
         Double latitude,
-        Double longitude
+        Double longitude,
+        boolean isReserved
 ) {
     public static AvailabilitySlotDto fromEntity(AvailabilitySlot slot) {
         return new AvailabilitySlotDto(
@@ -16,7 +17,8 @@ public record AvailabilitySlotDto(
                 slot.getStartTime(),
                 slot.getEndTime(),
                 slot.getLatitude(),
-                slot.getLongitude()
+                slot.getLongitude(),
+                slot.getReservation() != null
         );
     }
 }
