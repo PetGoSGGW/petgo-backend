@@ -2,7 +2,7 @@ package pl.petgo.backend.controller;
 
 import com.stripe.exception.SignatureVerificationException;
 import com.stripe.model.Event;
-import com.stripe.model.PaymentIntent;
+import com.stripe.model.checkout.Session;
 import com.stripe.net.Webhook;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -19,7 +19,7 @@ import pl.petgo.backend.repository.PaymentRepository;
 @RequestMapping("/api/webhooks")
 @RequiredArgsConstructor
 @Slf4j
-@Tag(name = "Payments Module - Stripe Webhooks", description = "Endpoints for handling asynchronous events and callbacks from Stripe")
+@Tag(name = "Webhooks", description = "Endpoints for handling Stripe asynchronous callbacks")
 public class StripeWebhookController {
 
     private final PaymentRepository paymentRepository;
@@ -28,10 +28,9 @@ public class StripeWebhookController {
     private String endpointSecret;
 
     @Operation(
-            summary = "Handle Stripe Webhook events",
-            description = "Receives asynchronous events from Stripe servers. Verifies the 'Stripe-Signature' header to ensure security. " +
-                    "Handles 'payment_intent.succeeded' and 'payment_intent.payment_failed' events to update payment status in the database. " +
-                    "NOTE: This endpoint is intended for machine-to-machine communication, not for manual testing via Swagger UI."
+            summary = "Handle Stripe Events",
+            description = "Processes events from Stripe (specifically 'checkout.session.completed'). " +
+                    "Verifies signature, updates payment status, and swaps Session ID with PaymentIntent ID."
     )
     @PostMapping("/stripe")
     public ResponseEntity<String> handleStripeEvent(@RequestBody String payload,
@@ -41,48 +40,39 @@ public class StripeWebhookController {
         try {
             event = Webhook.constructEvent(payload, sigHeader, endpointSecret);
         } catch (SignatureVerificationException e) {
-            log.error("Invalid Stripe signature");
+            log.error("Invalid Stripe Webhook signature");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid signature");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid payload");
         }
 
-        if ("payment_intent.succeeded".equals(event.getType())) {
-            PaymentIntent paymentIntent = (PaymentIntent) event.getDataObjectDeserializer().getObject().orElse(null);
-
-            if (paymentIntent != null) {
-                log.info("Payment succeeded: " + paymentIntent.getId());
-                handlePaymentSuccess(paymentIntent);
-            }
-        } else if ("payment_intent.payment_failed".equals(event.getType())) {
-            PaymentIntent paymentIntent = (PaymentIntent) event.getDataObjectDeserializer().getObject().orElse(null);
-            if (paymentIntent != null) {
-                log.info("Payment failed: " + paymentIntent.getId());
-                handlePaymentFailure(paymentIntent);
+        if ("checkout.session.completed".equals(event.getType())) {
+            Session session = (Session) event.getDataObjectDeserializer().getObject().orElse(null);
+            if (session != null) {
+                log.info("Checkout Session completed: {}", session.getId());
+                handleCheckoutSessionCompleted(session);
             }
         }
+
         return ResponseEntity.ok("Received");
     }
 
-    private void handlePaymentSuccess(PaymentIntent paymentIntent) {
-        paymentRepository.findByStripePaymentIntentId(paymentIntent.getId())
+    private void handleCheckoutSessionCompleted(Session session) {
+        paymentRepository.findByStripePaymentIntentId(session.getId())
                 .ifPresent(payment -> {
                     payment.setStatus(PaymentStatus.PAID);
+
+                    String paymentIntentId = session.getPaymentIntent();
+                    if (paymentIntentId != null) {
+                        payment.setStripePaymentIntentId(paymentIntentId);
+                    }
+
                     paymentRepository.save(payment);
 
-                    // TODO: Integration with Wallet and Reservations:
-                    // 1. Change Reservation status to CONFIRMED
-                    // 2. Transfer money data to walker's wallet
-                    log.info("Payment ({}) status updated to: PAID", payment.getPaymentId());
-                });
-    }
+                    log.info("Payment updated to PAID. Swapped Session ID for PaymentIntent ID: {}", paymentIntentId);
 
-    private void handlePaymentFailure(PaymentIntent paymentIntent) {
-        paymentRepository.findByStripePaymentIntentId(paymentIntent.getId())
-                .ifPresent(payment -> {
-                    payment.setStatus(PaymentStatus.FAILED);
-                    paymentRepository.save(payment);
-                    log.info("Payment ({}) status updated to: FAILED", payment.getPaymentId());
+                    // TODO: Update Reservation status to CONFIRMED
+                    // TODO: Top up Walker's Wallet
                 });
     }
 }
