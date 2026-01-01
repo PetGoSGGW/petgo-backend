@@ -1,4 +1,4 @@
-package pl.petgo.backend.dto.Reservation;
+package pl.petgo.backend.dto.reservation;
 
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;

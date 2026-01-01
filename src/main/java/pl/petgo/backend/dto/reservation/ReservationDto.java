@@ -1,7 +1,7 @@
-package pl.petgo.backend.dto.Reservation;
+package pl.petgo.backend.dto.reservation;
 import pl.petgo.backend.domain.Reservation;
 import pl.petgo.backend.domain.ReservationStatus;
-import pl.petgo.backend.dto.AvailabillitySlot.AvailabilitySlotDto;
+import pl.petgo.backend.dto.availabilityslot.AvailabilitySlotDto;
 import java.time.Instant;
 import java.util.List;
 
