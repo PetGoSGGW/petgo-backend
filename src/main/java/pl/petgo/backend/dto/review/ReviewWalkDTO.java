@@ -14,8 +14,8 @@ import java.util.Optional;
 
 public class ReviewWalkDTO extends ReviewAbstractDTO{
 
-    public final BasicUserInfoDto walkerInfoDto;
-    public final BasicDogInfoDto dogInfoDto;
+    private final BasicUserInfoDto walkerInfoDto;
+    private final BasicDogInfoDto dogInfoDto;
 
     public static ReviewWalkDTO getReviewWalkDTO(List<Review> reviews) throws DtoBuildException {
         Optional<Dog> dogOptional = reviews.stream()
@@ -24,7 +24,7 @@ public class ReviewWalkDTO extends ReviewAbstractDTO{
                 .collect(CollectionUtil.zeroOrOne());
 
         Optional<User> walkerOptional = reviews.stream()
-                .map(Review::getSubjectUser)
+                .map(Review::getAuthor)
                 .distinct()
                 .collect(CollectionUtil.zeroOrOne());
 
@@ -40,5 +40,13 @@ public class ReviewWalkDTO extends ReviewAbstractDTO{
 
         this.dogInfoDto = BasicDogInfoDto.from(dog);
         this.walkerInfoDto = BasicUserInfoDto.from(walker);
+    }
+
+    public BasicUserInfoDto getWalkerInfoDto() {
+        return walkerInfoDto;
+    }
+
+    public BasicDogInfoDto getDogInfoDto() {
+        return dogInfoDto;
     }
 }

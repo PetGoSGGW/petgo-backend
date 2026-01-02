@@ -12,7 +12,7 @@ import java.util.Optional;
 
 public class ReviewWalkerDTO extends ReviewAbstractDTO {
 
-    public final BasicUserInfoDto walkerInfoDto;
+    private final BasicUserInfoDto walkerInfoDto;
 
     public static ReviewWalkerDTO getReviewWalkerDTO(List<Review> reviews) throws DtoBuildException {
         Optional<User> walkerOptional = reviews.stream()
@@ -26,15 +26,12 @@ public class ReviewWalkerDTO extends ReviewAbstractDTO {
         return new ReviewWalkerDTO(walkerOptional.get(), reviews);
     }
 
-
     private ReviewWalkerDTO(User walker, List<Review> reviewList) {
         super(reviewList, ReviewType.WALKER);
         this.walkerInfoDto = BasicUserInfoDto.from(walker);
     }
 
-
-    public BasicUserInfoDto getWalkerDTO() {
-        return this.walkerInfoDto;
+    public BasicUserInfoDto getWalkerInfoDto() {
+        return walkerInfoDto;
     }
-
 }

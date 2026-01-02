@@ -3,6 +3,7 @@ package pl.petgo.backend.dto.review;
 import pl.petgo.backend.domain.Review;
 import pl.petgo.backend.domain.ReviewType;
 
+import java.util.Comparator;
 import java.util.List;
 
 public abstract class ReviewAbstractDTO {
@@ -20,6 +21,7 @@ public abstract class ReviewAbstractDTO {
 
         this.reviewDTOList = reviewsFilteredByType.stream()
                 .map(ReviewDTO::getReviewDTO)
+                .sorted(Comparator.comparing(ReviewDTO::createdAt).reversed())
                 .toList();
 
         this.avgRating = reviewsFilteredByType.stream()
