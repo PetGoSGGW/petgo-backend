@@ -27,7 +27,7 @@ public class UserController {
             summary = "Get all users",
             description = "Returns a list of all users."
     )
-    @GetMapping("/")
+    @GetMapping()
     public ResponseEntity<List<UserResponse>> getUsers(@AuthenticationPrincipal AppUserDetails principal) {
         return ResponseEntity.ok(users.findAll());
     }
