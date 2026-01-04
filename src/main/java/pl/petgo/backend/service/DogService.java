@@ -37,6 +37,9 @@ import static lombok.AccessLevel.PRIVATE;
 @FieldDefaults(level = PRIVATE, makeFinal = true)
 @Slf4j
 public class DogService {
+
+    public static final String DOG_NOT_FOUND_WITH_ID = "Dog not found with id: ";
+
     DogRepository dogRepository;
     DogPhotoRepository dogPhotoRepository;
     UserRepository userRepository;
@@ -55,7 +58,7 @@ public class DogService {
 
     public DogDto getDogById(Long id) {
         var dog = dogRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Dog not found with id: " + id));
+                .orElseThrow(() -> new NotFoundException(DOG_NOT_FOUND_WITH_ID + id));
 
         return dogMapper.toDto(dog);
     }
@@ -79,7 +82,7 @@ public class DogService {
     @Transactional
     public DogDto updateDog(Long id, DogUpdateRequestDto dogUpdateRequestDto) {
         var dog = dogRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Dog not found with id: " + id));
+                .orElseThrow(() -> new NotFoundException(DOG_NOT_FOUND_WITH_ID + id));
 
         if (!dog.getOwner().getEmail().equals(SecurityUtils.getUserEmail()) && !SecurityUtils.isAdmin()) {
             throw new AccessDeniedException("Access denied!");
@@ -100,7 +103,7 @@ public class DogService {
     @Transactional
     public void deleteDog(Long id) {
         var dog = dogRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Dog not found with id: " + id));
+                .orElseThrow(() -> new NotFoundException(DOG_NOT_FOUND_WITH_ID + id));
 
         if (!dog.getOwner().getEmail().equals(SecurityUtils.getUserEmail()) && !SecurityUtils.isAdmin()) {
             throw new AccessDeniedException("Access denied!");
@@ -121,7 +124,7 @@ public class DogService {
 
     public List<DogPhotoDto> getDogPhotos(Long id) {
         if (!dogRepository.existsById(id)) {
-            throw new NotFoundException("Dog not found with id: " + id);
+            throw new NotFoundException(DOG_NOT_FOUND_WITH_ID + id);
         }
         return dogPhotoRepository.getDogPhotosByDog_DogId(id).stream()
                 .map(dogMapper::toPhotoDto)
@@ -131,7 +134,7 @@ public class DogService {
     @Transactional
     public List<DogPhotoDto> addDogPhotos(Long id, List<MultipartFile> files) {
         var dog = dogRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Dog not found with id: " + id));
+                .orElseThrow(() -> new NotFoundException(DOG_NOT_FOUND_WITH_ID + id));
 
         if (!dog.getOwner().getEmail().equals(SecurityUtils.getUserEmail()) && !SecurityUtils.isAdmin()) {
             throw new AccessDeniedException("Access denied!");
