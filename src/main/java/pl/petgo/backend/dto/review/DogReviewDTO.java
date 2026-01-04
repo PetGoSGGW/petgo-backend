@@ -24,14 +24,17 @@ public class DogReviewDTO extends ReviewAbstractDTO {
         }
 
         Dog dog = dogOptional.get();
-        BasicDogInfoDto dogInfoDto = BasicDogInfoDto.from(dog);
-        return new DogReviewDTO(dogInfoDto, reviews);
+        return new DogReviewDTO(dog, reviews);
     }
 
+    public static DogReviewDTO getReviewDogDTOForNoReviews(Dog dog) {
+        List<Review> emptyReviews = List.of();
+        return new DogReviewDTO(dog, emptyReviews);
+    }
 
-    private DogReviewDTO(BasicDogInfoDto dogDto, List<Review> reviewList) {
+    private DogReviewDTO(Dog dog, List<Review> reviewList) {
         super(reviewList, ReviewType.DOG);
-        this.dogDto = dogDto;
+        this.dogDto = BasicDogInfoDto.from(dog);
     }
 
     public BasicDogInfoDto getDogDto() {

@@ -1,9 +1,10 @@
 package pl.petgo.backend.service;
 
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
+import pl.petgo.backend.domain.Dog;
+import pl.petgo.backend.domain.User;
 import pl.petgo.backend.domain.Reservation;
 import pl.petgo.backend.domain.ReservationStatus;
 import pl.petgo.backend.domain.Review;
@@ -12,8 +13,11 @@ import pl.petgo.backend.dto.review.CreateReviewRequest;
 import pl.petgo.backend.dto.review.DogReviewDTO;
 import pl.petgo.backend.dto.review.ReviewWalkDTO;
 import pl.petgo.backend.dto.review.ReviewWalkerDTO;
+import pl.petgo.backend.exception.NotFoundException;
+import pl.petgo.backend.repository.DogRepository;
 import pl.petgo.backend.repository.ReservationRepository;
 import pl.petgo.backend.repository.ReviewRepository;
+import pl.petgo.backend.repository.UserRepository;
 
 import java.util.List;
 
@@ -22,31 +26,60 @@ public class ReviewService {
 
     private final ReviewRepository reviewRepository;
     private final ReservationRepository reservationRepository;
+    private final UserRepository userRepository;
+    private final DogRepository dogRepository;
 
-    public ReviewService(ReviewRepository reviewRepository, ReservationRepository reservationRepository) {
+    public ReviewService(ReviewRepository reviewRepository,
+                         ReservationRepository reservationRepository,
+                         UserRepository userRepository,
+                         DogRepository dogRepository) {
         this.reviewRepository = reviewRepository;
         this.reservationRepository = reservationRepository;
+        this.userRepository = userRepository;
+        this.dogRepository = dogRepository;
     }
 
     public ReviewWalkerDTO getWalkerReview(Long walkerId) {
         List<Review> reviews = reviewRepository.findBySubjectUserUserId(walkerId);
-        return ReviewWalkerDTO.getReviewWalkerDTO(reviews);
+        if (!reviews.isEmpty()) {
+            return ReviewWalkerDTO.getReviewWalkerDTO(reviews);
+        }
+
+        User walker = userRepository.findById(walkerId)
+                .orElseThrow(() -> new NotFoundException("Walker does not exist with the specified ID: " + walkerId));
+        return ReviewWalkerDTO.getReviewWalkerDTOForNoReviews(walker);
     }
 
     public DogReviewDTO getDogReview(Long dogId) {
         List<Review> reviews = reviewRepository.findByDogDogId(dogId);
-        return DogReviewDTO.getReviewDogDTO(reviews);
+        if (!reviews.isEmpty()) {
+            return DogReviewDTO.getReviewDogDTO(reviews);
+        }
+
+        Dog dog = dogRepository.findById(dogId)
+                .orElseThrow(() -> new NotFoundException("Dog does not exist with the specified ID: " + dogId));
+        return DogReviewDTO.getReviewDogDTOForNoReviews(dog);
+
     }
 
     public ReviewWalkDTO getWalksByWalkerWithDogReview(Long dogId, Long walkerId) {
         List<Review> reviews = reviewRepository.findByDogDogIdAndAuthorUserId(dogId, walkerId);
-        return ReviewWalkDTO.getReviewWalkDTO(reviews);
+        if (!reviews.isEmpty()) {
+            return ReviewWalkDTO.getReviewWalkDTO(reviews);
+        }
+
+        Dog dog = dogRepository.findById(dogId)
+                .orElseThrow(() -> new NotFoundException("Dog does not exist with the specified ID: " + dogId));
+
+        User walker = userRepository.findById(walkerId)
+                .orElseThrow(() -> new NotFoundException("Walker does not exist with the specified ID: " + walkerId));
+        return ReviewWalkDTO.getReviewWalkDTOForNoReviews(dog, walker);
     }
 
     @Transactional
     public Long addReview(Long reviewerId, CreateReviewRequest request) {
         Reservation reservation = reservationRepository.findById(request.reservationId())
-                .orElseThrow(() -> new EntityNotFoundException(String.format("Reservation with the specified ID %s does not exist", request.reservationId())));
+                .orElseThrow(() -> new NotFoundException(String.format("Reservation with the specified ID %s does not exist", request.reservationId())));
 
         if (!ReservationStatus.COMPLETED.equals(reservation.getStatus())) {
             throw new IllegalStateException("Cannot review an incomplete reservation");
