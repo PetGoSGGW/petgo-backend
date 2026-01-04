@@ -35,6 +35,11 @@ public class ReviewWalkDTO extends ReviewAbstractDTO{
         return new ReviewWalkDTO(dogOptional.get(), walkerOptional.get(), reviews);
     }
 
+    public static ReviewWalkDTO getReviewWalkDTOForNoReviews(Dog dog, User walker) {
+        List<Review> emptyReviews = List.of();
+        return new ReviewWalkDTO(dog, walker, emptyReviews);
+    }
+
     private ReviewWalkDTO(Dog dog, User walker, List<Review> reviews) {
         super(reviews, ReviewType.WALK);
 

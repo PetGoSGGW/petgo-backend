@@ -26,6 +26,11 @@ public class ReviewWalkerDTO extends ReviewAbstractDTO {
         return new ReviewWalkerDTO(walkerOptional.get(), reviews);
     }
 
+    public static ReviewWalkerDTO getReviewWalkerDTOForNoReviews(User walker) {
+        List<Review> emptyReviews = List.of();
+        return new ReviewWalkerDTO(walker, emptyReviews);
+    }
+
     private ReviewWalkerDTO(User walker, List<Review> reviewList) {
         super(reviewList, ReviewType.WALKER);
         this.walkerInfoDto = BasicUserInfoDto.from(walker);
