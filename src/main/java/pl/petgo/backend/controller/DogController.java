@@ -9,10 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import pl.petgo.backend.dto.dog.DogCreateRequestDto;
-import pl.petgo.backend.dto.dog.DogDto;
-import pl.petgo.backend.dto.dog.DogPhotoDto;
-import pl.petgo.backend.dto.dog.DogUpdateRequestDto;
+import pl.petgo.backend.dto.dog.*;
 import pl.petgo.backend.service.DogService;
 
 import java.util.List;
@@ -95,6 +92,15 @@ public class DogController {
     @GetMapping("/{id}/photos")
     public ResponseEntity<List<DogPhotoDto>> getDogPhotos(@PathVariable Long id) {
         return ok(dogService.getDogPhotos(id));
+    }
+
+    @Operation(
+            summary = "Get all breeds",
+            description = "Fetches a list of all available dog breeds"
+    )
+    @GetMapping("/breeds")
+    public ResponseEntity<List<BreedDto>> getBreeds() {
+        return ok(dogService.getAllBreeds());
     }
 
     @Operation(

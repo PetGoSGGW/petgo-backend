@@ -10,10 +10,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import pl.petgo.backend.domain.Breed;
-import pl.petgo.backend.dto.dog.DogCreateRequestDto;
-import pl.petgo.backend.dto.dog.DogDto;
-import pl.petgo.backend.dto.dog.DogPhotoDto;
-import pl.petgo.backend.dto.dog.DogUpdateRequestDto;
+import pl.petgo.backend.dto.dog.*;
 import pl.petgo.backend.exception.FileStorageException;
 import pl.petgo.backend.exception.NotFoundException;
 import pl.petgo.backend.mapper.DogMapper;
@@ -185,5 +182,11 @@ public class DogService {
         var dog = photo.getDog();
         dog.getPhotos().remove(photo);
         dogRepository.save(dog);
+    }
+
+    public List<BreedDto> getAllBreeds() {
+        return breedRepository.findAll().stream()
+                .map(dogMapper::toBreedDto)
+                .toList();
     }
 }
