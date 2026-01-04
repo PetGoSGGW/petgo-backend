@@ -4,11 +4,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 import pl.petgo.backend.dto.ErrorDetails;
 import pl.petgo.backend.exception.DtoBuildException;
 import pl.petgo.backend.exception.FileStorageException;
@@ -21,11 +23,40 @@ import static org.springframework.http.HttpStatus.*;
 @RestControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler {
+
+    private static final String REQUESTED_RESOURCE_WAS_NOT_FOUND_MESSAGE = "The requested resource was not found";
+    private static final String INVALID_EMAIL_OR_PASSWORD_MESSAGE = "Invalid email or password";
     private static final String VALIDATION_ERROR_MESSAGE = "Validation failed for some fields!";
     private static final String FILE_TO_LARGE_ERROR_MESSAGE = "Uploaded file is too large!";
     private static final String FILE_STORAGE_ERROR_MESSAGE = "Error with file storage occurred. Please try again later!";
     private static final String ACCESS_DENIED_ERROR_MESSAGE = "You do not have permission to access this resource!";
     private static final String INTERNAL_SERVER_ERROR_MESSAGE = "An unexpected internal error occurred!";
+
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<ErrorDetails> handleNotFound(NoResourceFoundException ex) {
+        log.debug("Resource not found: {}", ex.getResourcePath());
+
+        var errorDetails = new ErrorDetails(
+                NOT_FOUND.value(),
+                NOT_FOUND.getReasonPhrase(),
+                REQUESTED_RESOURCE_WAS_NOT_FOUND_MESSAGE
+        );
+
+        return new ResponseEntity<>(errorDetails, NOT_FOUND);
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<ErrorDetails> handleBadCredentials(BadCredentialsException ex) {
+        log.debug("Authentication failed: {}", ex.getMessage());
+
+        var errorDetails = new ErrorDetails(
+                UNAUTHORIZED.value(),
+                UNAUTHORIZED.getReasonPhrase(),
+                INVALID_EMAIL_OR_PASSWORD_MESSAGE
+        );
+
+        return new ResponseEntity<>(errorDetails, UNAUTHORIZED);
+    }
 
     @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<ErrorDetails> handleEntityNotFound(NotFoundException ex) {
@@ -58,7 +89,7 @@ public class GlobalExceptionHandler {
 
         var validationErrors = new HashMap<String, String>();
         ex.getBindingResult().getAllErrors()
-                .forEach((error) -> {
+                .forEach(error -> {
                     var fieldName = ((FieldError) error).getField();
                     var errorMessage = error.getDefaultMessage();
                     validationErrors.put(fieldName, errorMessage);
