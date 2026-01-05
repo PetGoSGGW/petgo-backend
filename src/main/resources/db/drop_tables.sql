@@ -1,0 +1,20 @@
+DROP TABLE IF EXISTS 
+    chat_messages, 
+    dog_photos, 
+    gps_points, 
+    user_reports,
+    availability_slots, 
+    reservations, 
+    reviews, 
+    payments, 
+    transactions, 
+    wallets, 
+    domain_events, 
+    gps_sessions,
+    offers, 
+    chats, 
+    breeds, 
+    dogs, 
+    addresses, 
+    users 
+CASCADE;
