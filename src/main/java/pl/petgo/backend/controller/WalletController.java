@@ -28,6 +28,28 @@ import java.util.List;
 public class WalletController {
     private final WalletService walletService;
 
+    @GetMapping("/me")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(
+            summary = "Get my wallet",
+            description = "Returns wallet details for the currently logged-in user"
+    )
+    public ResponseEntity<WalletResponse> getMyWallet(@AuthenticationPrincipal AppUserDetails principal) {
+        Long userId = principal.getUser().getUserId();
+        return ResponseEntity.ok(walletService.getWalletByUserId(userId));
+    }
+
+    @GetMapping("/me/transactions")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(
+            summary = "Get my wallet transactions",
+            description = "Returns a list of all transactions associated with the current user's wallet"
+    )
+    public ResponseEntity<List<TransactionResponse>> getMyTransactions(@AuthenticationPrincipal AppUserDetails principal) {
+        Long userId = principal.getUser().getUserId();
+        return ResponseEntity.ok(walletService.getTransactionsByUserId(userId));
+    }
+
     @GetMapping("/{id}")
     @PreAuthorize("isAuthenticated()")
     @Operation(
