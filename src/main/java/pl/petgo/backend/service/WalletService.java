@@ -7,12 +7,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.petgo.backend.domain.Transaction;
 import pl.petgo.backend.domain.TransactionType;
+import pl.petgo.backend.domain.User;
 import pl.petgo.backend.domain.Wallet;
 import pl.petgo.backend.dto.PayoutRequest;
 import pl.petgo.backend.dto.TopupRequest;
 import pl.petgo.backend.dto.WalletResponse;
 import pl.petgo.backend.dto.TransactionResponse;
+import pl.petgo.backend.exception.NotFoundException;
 import pl.petgo.backend.repository.TransactionRepository;
+import pl.petgo.backend.repository.UserRepository;
 import pl.petgo.backend.repository.WalletRepository;
 
 import java.time.Instant;
@@ -22,7 +25,14 @@ import java.util.List;
 @RequiredArgsConstructor
 public class WalletService {
     private final WalletRepository walletRepository;
+    private final UserRepository userRepository;
     private final TransactionRepository transactionRepository;
+
+    public Wallet createWallet(long userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User not found"));
+        Wallet wallet = Wallet.builder().user(user).build();
+        return walletRepository.save(wallet);
+    }
 
     @Transactional(readOnly = true)
     public WalletResponse getWallet(Long id) {
@@ -124,6 +134,26 @@ public class WalletService {
         walletRepository.save(wallet);
 
         return getWallet(walletId);
+    }
+
+    public WalletResponse getWalletByUserId(Long userId) {
+        return walletRepository.findByUserUserId(userId)
+                .map(wallet -> new WalletResponse(
+                        wallet.getWalletId(),
+                        wallet.getUser().getUserId(),
+                        wallet.getCurrency(),
+                        wallet.getBalanceCents(),
+                        wallet.getCreatedAt(),
+                        wallet.getUpdatedAt()
+                ))
+                .orElseThrow(() -> new NotFoundException("Wallet not found for user ID: " + userId));
+    }
+
+    public List<TransactionResponse> getTransactionsByUserId(Long userId) {
+        Wallet wallet = walletRepository.findByUserUserId(userId)
+                .orElseThrow(() -> new NotFoundException("Wallet not found for user ID: " + userId));
+
+        return getTransactions(wallet.getWalletId());
     }
 }
 
