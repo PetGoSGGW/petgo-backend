@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -40,6 +41,19 @@ public class GlobalExceptionHandler {
                 NOT_FOUND.value(),
                 NOT_FOUND.getReasonPhrase(),
                 REQUESTED_RESOURCE_WAS_NOT_FOUND_MESSAGE
+        );
+
+        return new ResponseEntity<>(errorDetails, NOT_FOUND);
+    }
+
+    @ExceptionHandler(UsernameNotFoundException.class)
+    public ResponseEntity<ErrorDetails> handleBadCredentials(UsernameNotFoundException ex) {
+        log.debug("Username not found: {}", ex.getMessage());
+
+        var errorDetails = new ErrorDetails(
+                NOT_FOUND.value(),
+                NOT_FOUND.getReasonPhrase(),
+                ex.getMessage()
         );
 
         return new ResponseEntity<>(errorDetails, NOT_FOUND);
