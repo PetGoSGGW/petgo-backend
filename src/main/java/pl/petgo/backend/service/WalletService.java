@@ -136,6 +136,16 @@ public class WalletService {
         return getWallet(walletId);
     }
 
+    @Transactional
+    public void addFundsSystem(Long userId, Long amountCents, String description) {
+        processBalanceChange(userId, amountCents, description, TransactionType.TOPUP, true);
+    }
+
+    @Transactional
+    public void deductFundsSystem(Long userId, Long amountCents, String description) {
+        processBalanceChange(userId, amountCents, description, TransactionType.PAYMENT, false);
+    }
+
     public WalletResponse getWalletByUserId(Long userId) {
         return walletRepository.findByUserUserId(userId)
                 .map(wallet -> new WalletResponse(
@@ -154,6 +164,31 @@ public class WalletService {
                 .orElseThrow(() -> new NotFoundException("Wallet not found for user ID: " + userId));
 
         return getTransactions(wallet.getWalletId());
+    }
+
+    private void processBalanceChange(Long userId, Long amountCents, String description,
+                                      TransactionType type, boolean isAddition) {
+
+        Wallet wallet = walletRepository.findByUserUserId(userId)
+                .orElseThrow(() -> new NotFoundException("Wallet not found for user ID: " + userId));
+
+        long change = isAddition ? amountCents : -amountCents;
+        Long newBalance = wallet.getBalanceCents() + change;
+
+        wallet.setBalanceCents(newBalance);
+
+        Transaction tx = Transaction.builder()
+                .wallet(wallet)
+                .user(wallet.getUser())
+                .amountCents(amountCents)
+                .balanceAfterCents(newBalance)
+                .type(type)
+                .description(description)
+                .createdAt(Instant.now())
+                .build();
+
+        transactionRepository.save(tx);
+        walletRepository.save(wallet);
     }
 }
 
