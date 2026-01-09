@@ -91,10 +91,10 @@ public class ReservationService {
     public List<ReservationDto> getAllReservationsForUser(AppUserDetails userDetails) {
         User user = userDetails.getUser();
 
-        List<ReservationDto> reservationDtos = reservationRepository.findAllByOwner_UserId(user.getUserId())
-                .stream().map(ReservationDto::fromEntity).collect(Collectors.toList());
-
-        return reservationDtos;
+        return reservationRepository.findAllByOwner_UserId(user.getUserId())
+                .stream()
+                .map(ReservationDto::fromEntity)
+                .toList();
     }
 
     public List<ReservationDto> getAllReservationsForDog(AppUserDetails userDetails, Long dogId) {
@@ -107,10 +107,10 @@ public class ReservationService {
             throw new SecurityException("User with id: " + userId + " is not the owner of the dog with id: " + dogId);
         }
 
-        List<ReservationDto> reservationDtos = reservationRepository.findAllByDog_DogId(dogId)
-                .stream().map(ReservationDto::fromEntity).collect(Collectors.toList());
-
-        return reservationDtos;
+        return reservationRepository.findAllByDog_DogId(dogId)
+                .stream()
+                .map(ReservationDto::fromEntity)
+                .toList();
     }
 
     public void confirmReservation(AppUserDetails userDetails, Long reservationId){
