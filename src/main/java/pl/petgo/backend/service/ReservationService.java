@@ -162,4 +162,45 @@ public class ReservationService {
         slotRepository.saveAll(bookedSlots);
         reservationRepository.save(reservation);
     }
+
+    public void confirmReservationSystem(Long reservationId) {
+        Reservation reservation = reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new EntityNotFoundException("Reservation with id: " + reservationId + " does not exist"));
+
+        if (reservation.getStatus() == ReservationStatus.CONFIRMED) {
+            log.info("Reservation {} is already confirmed. Skipping.", reservationId);
+            return;
+        }
+
+        if (reservation.getStatus() != ReservationStatus.PENDING) {
+            throw new IllegalArgumentException("Cannot confirm reservation via payment system because status is: " + reservation.getStatus());
+        }
+
+        reservation.setStatus(ReservationStatus.CONFIRMED);
+        reservationRepository.save(reservation);
+        log.info("Reservation {} confirmed by system after successful payment.", reservationId);
+    }
+
+    public void cancelReservationSystem(Long reservationId) {
+        Reservation reservation = reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new EntityNotFoundException("Reservation with id: " + reservationId + " does not exist"));
+
+        if (reservation.getStatus() == ReservationStatus.CANCELLED) {
+            return;
+        }
+
+        if (reservation.getStatus() == ReservationStatus.COMPLETED) {
+            throw new IllegalArgumentException("Cannot system-cancel a completed reservation");
+        }
+
+        reservation.setStatus(ReservationStatus.CANCELLED);
+
+        reservation.setBookedSlots(null);
+        List<AvailabilitySlot> bookedSlots = slotRepository.findAllByReservation_ReservationId(reservationId);
+        bookedSlots.forEach(slot -> slot.setReservation(null));
+        slotRepository.saveAll(bookedSlots);
+
+        reservationRepository.save(reservation);
+        log.info("Reservation {} cancelled by system (payment failed/expired).", reservationId);
+    }
 }
