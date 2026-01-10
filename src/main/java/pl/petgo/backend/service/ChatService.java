@@ -7,6 +7,7 @@ import pl.petgo.backend.domain.Chat;
 import pl.petgo.backend.domain.ChatMessage;
 import pl.petgo.backend.domain.Reservation;
 import pl.petgo.backend.domain.User;
+import pl.petgo.backend.dto.chat.ChatDto;
 import pl.petgo.backend.exception.NotFoundException;
 import pl.petgo.backend.repository.ChatMessageRepository;
 import pl.petgo.backend.repository.ChatRepository;
@@ -17,7 +18,6 @@ import pl.petgo.backend.security.AppUserDetails;
 import org.springframework.security.access.AccessDeniedException;
 import java.time.Instant;
 import java.util.List;
-import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -28,21 +28,22 @@ public class ChatService {
     private final ReservationRepository reservationRepository;
     private final UserRepository userRepository;
 
-    public Chat getOrCreateChat(Long reservationId, AppUserDetails principal) throws AccessDeniedException {
+    public ChatDto getOrCreateChat(Long reservationId, AppUserDetails principal) throws AccessDeniedException {
         Reservation reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new EntityNotFoundException("Reservation not found"));
 
+        User owner = reservation.getOwner();
+        User walker = reservation.getWalker();
         Long currentUserId = principal.getUser().getUserId();
 
-        boolean isOwner = Objects.equals(reservation.getOwner().getUserId(), currentUserId);
-        boolean isWalker = Objects.equals(reservation.getWalker().getUserId(), currentUserId);
-
-        if (!isOwner && !isWalker) {
+        if (!owner.getUserId().equals(currentUserId) && !walker.getUserId().equals(currentUserId)) {
             throw new AccessDeniedException("You are not a participant in this reservation.");
         }
 
-        return chatRepository.findByReservation_ReservationId(reservationId)
+        Chat chat = chatRepository.findByReservation_ReservationId(reservationId)
                 .orElseGet(() -> createChat(reservation));
+
+        return ChatDto.from(chat, owner, walker);
     }
 
     private Chat createChat(Reservation reservation) {

@@ -27,8 +27,8 @@ public class ChatController {
             description = "Retrieves an existing chat associated with a specific reservation ID. If no chat exists, a new one is created."
     )
     @GetMapping("/reservation/{reservationId}")
-    public ChatDto getOrCreateChat(@PathVariable Long reservationId, @AuthenticationPrincipal AppUserDetails principal) throws AccessDeniedException {
-        return ChatDto.from(chatService.getOrCreateChat(reservationId, principal));
+    public ChatDto getOrCreateChat(@PathVariable Long reservationId, @AuthenticationPrincipal AppUserDetails principal) {
+        return chatService.getOrCreateChat(reservationId, principal);
     }
 
     @Operation(
@@ -36,7 +36,7 @@ public class ChatController {
             description = "Fetches a historical list of all messages sent within a specific chat session."
     )
     @GetMapping("/{chatId}/messages")
-    public List<ChatMessageDto> getMessages(@PathVariable Long chatId, @AuthenticationPrincipal AppUserDetails principal) throws AccessDeniedException {
+    public List<ChatMessageDto> getMessages(@PathVariable Long chatId, @AuthenticationPrincipal AppUserDetails principal) {
         return chatService.getMessages(chatId, principal).stream()
                 .map(ChatMessageDto::from)
                 .toList();
@@ -51,7 +51,7 @@ public class ChatController {
             @PathVariable Long chatId,
             @RequestBody SendMessageRequest request,
             @AuthenticationPrincipal AppUserDetails principal
-    ) throws AccessDeniedException {
+    ) {
         return ChatMessageDto.from(
                 chatService.sendMessage(chatId, request.content(), principal)
         );
