@@ -60,8 +60,21 @@ public class OfferService {
 
     @Transactional(readOnly = true)
     public Page<OfferDto> searchOffers(Double lat, Double lon, Double radius, Pageable pageable) {
-        return offerRepository.findAllActiveInRadius(lat, lon, radius != null ? radius : 10.0, pageable)
-                .map(OfferDto::fromEntity);
+        if (lat == null || lon == null) {
+            return offerRepository.findAllByIsActiveTrue(pageable)
+                    .map(OfferDto::fromEntity);
+        }
+
+        double r = (radius != null ? radius : 10.0);
+
+        double latDiff = r / 111.0;
+        double lonDiff = r / (111.0 * Math.cos(Math.toRadians(lat)));
+
+        return offerRepository.findDistinctByIsActiveTrueAndAvailabilitySlots_ReservationIsNullAndAvailabilitySlots_LatitudeBetweenAndAvailabilitySlots_LongitudeBetween(
+                lat - latDiff, lat + latDiff,
+                lon - lonDiff, lon + lonDiff,
+                pageable
+        ).map(OfferDto::fromEntity);
     }
 
     @Transactional(readOnly = true)
