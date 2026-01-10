@@ -3,12 +3,15 @@ package pl.petgo.backend.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import pl.petgo.backend.dto.chat.ChatDto;
 import pl.petgo.backend.dto.chat.ChatMessageDto;
 import pl.petgo.backend.dto.chat.SendMessageRequest;
+import pl.petgo.backend.security.AppUserDetails;
 import pl.petgo.backend.service.ChatService;
 
+import java.nio.file.AccessDeniedException;
 import java.util.List;
 
 @RestController
@@ -24,8 +27,8 @@ public class ChatController {
             description = "Retrieves an existing chat associated with a specific reservation ID. If no chat exists, a new one is created."
     )
     @GetMapping("/reservation/{reservationId}")
-    public ChatDto getOrCreateChat(@PathVariable Long reservationId) {
-        return ChatDto.from(chatService.getOrCreateChat(reservationId));
+    public ChatDto getOrCreateChat(@PathVariable Long reservationId, @AuthenticationPrincipal AppUserDetails principal) throws AccessDeniedException {
+        return ChatDto.from(chatService.getOrCreateChat(reservationId, principal));
     }
 
     @Operation(
@@ -33,8 +36,8 @@ public class ChatController {
             description = "Fetches a historical list of all messages sent within a specific chat session."
     )
     @GetMapping("/{chatId}/messages")
-    public List<ChatMessageDto> getMessages(@PathVariable Long chatId) {
-        return chatService.getMessages(chatId).stream()
+    public List<ChatMessageDto> getMessages(@PathVariable Long chatId, @AuthenticationPrincipal AppUserDetails principal) throws AccessDeniedException {
+        return chatService.getMessages(chatId, principal).stream()
                 .map(ChatMessageDto::from)
                 .toList();
     }
@@ -46,10 +49,11 @@ public class ChatController {
     @PostMapping("/{chatId}/messages")
     public ChatMessageDto sendMessage(
             @PathVariable Long chatId,
-            @RequestBody SendMessageRequest request
-    ) {
+            @RequestBody SendMessageRequest request,
+            @AuthenticationPrincipal AppUserDetails principal
+    ) throws AccessDeniedException {
         return ChatMessageDto.from(
-                chatService.sendMessage(chatId, request.senderId(), request.content())
+                chatService.sendMessage(chatId, request.content(), principal)
         );
     }
 }
