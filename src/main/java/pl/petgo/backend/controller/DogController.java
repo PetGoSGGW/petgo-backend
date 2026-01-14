@@ -80,7 +80,7 @@ public class DogController {
             summary = "Get dogs by owner",
             description = "Fetches a list of dogs belonging to a specific owner"
     )
-    @GetMapping("/{ownerId}")
+    @GetMapping("/owner/{ownerId}")
     public ResponseEntity<List<DogDto>> getOwnerDogs(@PathVariable Long ownerId) {
         return ok(dogService.getDogsByOwner(ownerId));
     }
