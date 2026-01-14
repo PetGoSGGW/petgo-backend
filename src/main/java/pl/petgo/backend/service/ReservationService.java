@@ -2,6 +2,7 @@ package pl.petgo.backend.service;
 import jakarta.persistence.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import pl.petgo.backend.domain.*;
 import pl.petgo.backend.dto.reservation.ReservationCreateRequest;
@@ -37,7 +38,7 @@ public class ReservationService {
                 .orElseThrow(() -> new EntityNotFoundException("Dog not found"));
 
         if (!dog.getOwner().getUserId().equals(userId)) {
-            throw new SecurityException("User is not the owner of this dog");
+            throw new AccessDeniedException("User is not the owner of this dog");
         }
 
         List<AvailabilitySlot> slots = slotRepository.findAllById(request.availabilitySlotIds());
@@ -104,7 +105,7 @@ public class ReservationService {
                 .orElseThrow(() -> new EntityNotFoundException("Dog with id: " + dogId + " does not exist"));
 
         if (!dog.getOwner().getUserId().equals(userId)) {
-            throw new SecurityException("User with id: " + userId + " is not the owner of the dog with id: " + dogId);
+            throw new AccessDeniedException("User with id: " + userId + " is not the owner of the dog with id: " + dogId);
         }
 
         return reservationRepository.findAllByDog_DogId(dogId)
