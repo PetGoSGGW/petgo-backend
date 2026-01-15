@@ -98,6 +98,15 @@ public class ReservationService {
                 .toList();
     }
 
+    public List<ReservationDto> getAllReservationsForWalker(AppUserDetails userDetails) {
+        User user = userDetails.getUser();
+
+        return reservationRepository.findAllByWalker_UserId(user.getUserId())
+                .stream()
+                .map(ReservationDto::fromEntity)
+                .toList();
+    }
+
     public List<ReservationDto> getAllReservationsForDog(AppUserDetails userDetails, Long dogId) {
         Long userId = userDetails.getUser().getUserId();
 
