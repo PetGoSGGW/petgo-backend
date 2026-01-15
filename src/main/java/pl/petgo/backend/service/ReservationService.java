@@ -166,9 +166,6 @@ public class ReservationService {
         reservation.setStatus(ReservationStatus.CANCELLED);
         reservation.setBookedSlots(null);
 
-        List<AvailabilitySlot> bookedSlots = slotRepository.findAllByReservation_ReservationId(reservationId);
-        bookedSlots.forEach(slot -> slot.setReservation(null));
-
         slotRepository.saveAll(bookedSlots);
         reservationRepository.save(reservation);
     }
