@@ -166,7 +166,6 @@ public class ReservationService {
         reservation.setStatus(ReservationStatus.CANCELLED);
         reservation.setBookedSlots(null);
 
-        slotRepository.saveAll(bookedSlots);
         reservationRepository.save(reservation);
     }
 
