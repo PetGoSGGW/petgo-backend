@@ -3,6 +3,8 @@ package pl.petgo.backend.domain;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "reservations")
@@ -43,11 +45,16 @@ public class Reservation {
     @Column(name = "status", nullable = false)
     private ReservationStatus status;
 
+    @Builder.Default
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt = Instant.now();
 
     @Column(name = "updated_at")
     private Instant updatedAt;
+
+    @Builder.Default
+    @OneToMany(mappedBy = "reservation", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<AvailabilitySlot> bookedSlots = new ArrayList<>();
 
     @PrePersist
     protected void onCreate() {

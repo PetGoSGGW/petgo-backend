@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -12,6 +13,8 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@EqualsAndHashCode(exclude = {"offer"})
+@ToString(exclude = {"offer"})
 public class User {
 
     @Id
@@ -37,15 +40,17 @@ public class User {
     @Column(name = "date_of_birth")
     private LocalDate dateOfBirth;
 
+    @Builder.Default
     @Column(name = "is_active", nullable = false)
     private Boolean isActive = true;
 
+    @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false)
     private Role role = Role.USER;
 
-    @OneToMany(mappedBy = "walker")
-    private List<Offer> offers;
+    @OneToOne(mappedBy = "walker", cascade = CascadeType.ALL)
+    private Offer offer;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
@@ -58,6 +63,14 @@ public class User {
 
     @OneToMany(mappedBy = "sender", cascade = CascadeType.ALL)
     private List<ChatMessage> sentMessages;
+
+    @Builder.Default
+    @OneToMany(mappedBy = "reporter")
+    private List<UserReport> reportsMade = new ArrayList<>();
+
+    @Builder.Default
+    @OneToMany(mappedBy = "reported")
+    private List<UserReport> reportsReceived = new ArrayList<>();
 
     @PrePersist
     protected void onCreate() {

@@ -21,12 +21,15 @@ public class Wallet {
     @JoinColumn(name = "user_id", nullable = false, unique = true)
     private User user;
 
+    @Builder.Default
     @Column(name = "currency", nullable = false)
-    private String currency;
+    private String currency = "PLN";
 
+    @Builder.Default
     @Column(name = "balance_cents", nullable = false)
     private Long balanceCents = 0L;
 
+    @Builder.Default
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt = Instant.now();
 
