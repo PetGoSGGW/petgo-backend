@@ -34,13 +34,25 @@ public class ReservationController {
     }
 
     @Operation(
-            summary = "Get all reservation for user"
+            summary = "Get all reservation for user (owner)"
     )
     @GetMapping("/reservations")
     public ResponseEntity<List<ReservationDto>> getAllReservationForUser(
             @AuthenticationPrincipal AppUserDetails userDetails
     ) {
         List<ReservationDto> result = reservationService.getAllReservationsForUser(userDetails);
+
+        return ResponseEntity.ok(result);
+    }
+
+    @Operation(
+            summary = "Get all reservation for walker"
+    )
+    @GetMapping("/reservations/walker")
+    public ResponseEntity<List<ReservationDto>> getAllReservationForWalker(
+            @AuthenticationPrincipal AppUserDetails userDetails
+    ) {
+        List<ReservationDto> result = reservationService.getAllReservationsForWalker(userDetails);
 
         return ResponseEntity.ok(result);
     }

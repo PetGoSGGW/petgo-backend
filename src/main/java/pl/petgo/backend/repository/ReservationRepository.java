@@ -9,6 +9,7 @@ import java.util.List;
 
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
     List<Reservation> findAllByOwner_UserId(Long ownerUserId);
+    List<Reservation> findAllByWalker_UserId(Long walkerUserId);
     List<Reservation> findAllByDog_DogId(Long dogId);
 
     boolean existsByOfferAndDogAndOwnerAndWalkerAndScheduledStartAndScheduledEndAndStatusNotIn(
