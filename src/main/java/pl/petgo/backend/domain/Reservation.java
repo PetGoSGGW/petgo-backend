@@ -53,7 +53,7 @@ public class Reservation {
     private Instant updatedAt;
 
     @Builder.Default
-    @OneToMany(mappedBy = "reservation", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "reservation", cascade = CascadeType.ALL, orphanRemoval = false)
     private List<AvailabilitySlot> bookedSlots = new ArrayList<>();
 
     @PrePersist
