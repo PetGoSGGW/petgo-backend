@@ -32,4 +32,20 @@ public record OfferDto(
                         : List.of()
         );
     }
+
+    public static OfferDto fromEntityNotReserved(Offer offer) {
+        return new OfferDto(
+                offer.getOfferId(),
+                offer.getWalker().getUserId(),
+                offer.getWalker().getFirstName() + " " + offer.getWalker().getLastName(),
+                offer.getPriceCents(),
+                offer.getDescription(),
+                offer.isActive(),
+                offer.getCreatedAt(),
+                offer.getAvailabilitySlots().stream()
+                        .filter(as -> as.getReservation() == null)
+                        .map(AvailabilitySlotDto::fromEntity)
+                        .toList()
+        );
+    }
 }
