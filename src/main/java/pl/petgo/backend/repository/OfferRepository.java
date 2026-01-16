@@ -16,5 +16,5 @@ public interface OfferRepository extends JpaRepository<Offer, Long> {
             Pageable pageable
     );
 
-    Page<Offer> findAllByIsActiveTrue(Pageable pageable);
+    Page<Offer> findDistinctByIsActiveTrueAndAvailabilitySlots_ReservationIsNull(Pageable pageable);
 }
