@@ -21,7 +21,7 @@ import static java.util.UUID.randomUUID;
 @Slf4j
 public class PhotosUtils {
 
-    private static final String FILE_PREFIX_URL = "/api/photos/dogs/";
+    private static final String FILE_PREFIX_URL = "/api/api/photos/dogs/";
 
     public DogPhoto saveSinglePhoto(MultipartFile file, Dog dog, Path uploadDir) {
         var originalFilename = file.getOriginalFilename();
