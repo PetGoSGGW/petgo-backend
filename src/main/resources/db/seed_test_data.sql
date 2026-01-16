@@ -81,10 +81,10 @@ INSERT INTO public."dogs" ("dog_id", "owner_id", "name", "breed_code", "size", "
                              (6, 8, 'Daisy', 'GLD', 'LARGE', 30.0, 'Kocha wszystkich ludzi.', TRUE, '2025-05-21 10:05:00+01');
 
 INSERT INTO public."dog_photos" ("photo_id", "dog_id", "url", "uploaded_at") VALUES
-(1, 1, 'https://homelab-storage.local/dogs/burek.jpg', '2025-01-05 10:00:00+01'),
-(2, 2, 'https://homelab-storage.local/dogs/luna.jpg', '2025-01-05 10:05:00+01'),
-(3, 4, 'https://homelab-storage.local/dogs/fafik.jpg', '2025-03-11 09:05:00+01'),
-(4, 5, 'https://homelab-storage.local/dogs/ares.jpg', '2025-05-21 10:10:00+01');
+(1, 1, '/photos/dogs/1/burek.jpg', '2025-01-05 10:00:00+01'),
+(2, 2, '/photos/dogs/2/luna.jpg', '2025-01-05 10:05:00+01'),
+(3, 4, '/photos/dogs/4/fafik.jpeg', '2025-03-11 09:05:00+01'),
+(4, 5, '/photos/dogs/5/ares.jpg', '2025-05-21 10:10:00+01');
 
 -- 6. OFERTY (OFFERS)
 -- ---------------------------------------------------------------------------------
