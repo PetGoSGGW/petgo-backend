@@ -1,6 +1,7 @@
 package pl.petgo.backend.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -15,6 +16,7 @@ import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AuthService {
 
     private final UserRepository users;
@@ -45,6 +47,7 @@ public class AuthService {
     }
 
     public AuthResponse login(LoginRequest req) {
+        log.info("Starting login process");
         User u = users.findByEmail(req.email()).orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
         authManager.authenticate(new UsernamePasswordAuthenticationToken(req.email(), req.password()));
