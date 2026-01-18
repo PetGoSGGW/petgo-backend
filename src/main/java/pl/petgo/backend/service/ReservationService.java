@@ -15,7 +15,6 @@ import pl.petgo.backend.security.AppUserDetails;
 import java.time.Instant;
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -127,7 +126,7 @@ public class ReservationService {
         Reservation reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new EntityNotFoundException("Reservation with id: " + reservationId + " does not exist"));
 
-        boolean isWalker = reservation.getWalker().equals(userDetails.getUser());
+        boolean isWalker = reservation.getWalker().getUserId().equals(userDetails.getUser().getUserId());
 
         if(reservation.getStatus() == ReservationStatus.CONFIRMED){
             throw new IllegalArgumentException("Reservation with id: " + reservationId + " is already confirmed");
@@ -149,7 +148,7 @@ public class ReservationService {
         Reservation reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new EntityNotFoundException("Reservation with id: " + reservationId + " does not exist"));
 
-        boolean isWalker = reservation.getWalker().equals(userDetails.getUser());
+        boolean isWalker = reservation.getWalker().getUserId().equals(userDetails.getUser().getUserId());
 
         if(reservation.getStatus() == ReservationStatus.CANCELLED){
             throw new IllegalArgumentException("Reservation with id: " + reservationId + " is already cancelled");
