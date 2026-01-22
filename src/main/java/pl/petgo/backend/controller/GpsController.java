@@ -44,7 +44,7 @@ public class GpsController {
     }
 
     @Operation(
-            summary = "Stop an active tracking session",
+            summary = "Stop an active tracking session and set reservation status as complete",
             description = "Finalizes the tracking session. No more points can be recorded for this session ID after it is stopped."
     )
     @PostMapping("/stop/{sessionId}")
