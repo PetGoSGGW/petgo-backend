@@ -10,6 +10,8 @@ import java.time.Instant;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@EqualsAndHashCode(exclude = {"chat", "sender"})
+@ToString(exclude = {"chat", "sender"})
 public class ChatMessage {
 
     @Id

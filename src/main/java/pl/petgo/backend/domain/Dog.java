@@ -11,6 +11,8 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@EqualsAndHashCode(exclude = {"owner", "breed", "photos"})
+@ToString(exclude = {"owner", "breed", "photos"})
 public class Dog {
 
     @Id

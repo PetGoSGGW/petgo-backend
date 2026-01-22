@@ -10,6 +10,8 @@ import java.time.Instant;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@EqualsAndHashCode(exclude = {"session"})
+@ToString(exclude = {"session"})
 public class GpsPoint {
 
     @Id

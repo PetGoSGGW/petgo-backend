@@ -10,6 +10,8 @@ import java.time.Instant;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@EqualsAndHashCode(exclude = {"reporter"})
+@ToString(exclude = {"reporter"})
 public class UserReport {
 
     @Id

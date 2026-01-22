@@ -11,6 +11,8 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@EqualsAndHashCode(exclude = {"reservation"})
+@ToString(exclude = {"reservation"})
 public class GpsSession {
 
     @Id

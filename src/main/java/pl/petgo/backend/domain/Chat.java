@@ -11,6 +11,8 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@EqualsAndHashCode(exclude = {"reservation", "messages"})
+@ToString(exclude = {"reservation", "messages"})
 public class Chat {
 
     @Id
