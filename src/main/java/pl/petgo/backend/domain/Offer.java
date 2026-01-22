@@ -11,6 +11,8 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@EqualsAndHashCode(exclude = {"walker", "availabilitySlots"})
+@ToString(exclude = {"walker", "availabilitySlots"})
 public class Offer {
 
     @Id

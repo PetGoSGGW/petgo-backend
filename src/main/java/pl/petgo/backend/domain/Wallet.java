@@ -10,6 +10,8 @@ import java.time.Instant;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@EqualsAndHashCode(exclude = {"user"})
+@ToString(exclude = {"user"})
 public class Wallet {
 
     @Id

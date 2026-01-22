@@ -10,6 +10,8 @@ import java.time.Instant;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@EqualsAndHashCode(exclude = {"reservation", "payer", "payee"})
+@ToString(exclude = {"reservation", "payer", "payee"})
 public class Payment {
 
     @Id

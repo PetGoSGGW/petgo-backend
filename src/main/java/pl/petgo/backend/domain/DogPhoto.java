@@ -10,6 +10,8 @@ import java.time.Instant;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@EqualsAndHashCode(exclude = {"dog"})
+@ToString(exclude = {"dog"})
 public class DogPhoto {
 
     @Id
