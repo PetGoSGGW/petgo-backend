@@ -54,8 +54,8 @@ public class PaymentService {
         User payee = reservation.getWalker();
         Long amountCents = Long.valueOf(offer.getPriceCents());
 
-        String successUrl = baseUrl + "/api/payments/success-mock";
-        String cancelUrl = baseUrl + "/api/payments/cancel-mock";
+        String successUrl = baseUrl + "/payments/success";
+        String cancelUrl = baseUrl + "/payments/cancel";
 
         SessionCreateParams params = SessionCreateParams.builder()
                 .setMode(SessionCreateParams.Mode.PAYMENT)

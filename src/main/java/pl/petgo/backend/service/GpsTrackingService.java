@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import pl.petgo.backend.domain.GpsPoint;
 import pl.petgo.backend.domain.GpsSession;
 import pl.petgo.backend.domain.Reservation;
+import pl.petgo.backend.domain.ReservationStatus;
 import pl.petgo.backend.dto.GpsPointDto;
 import pl.petgo.backend.exception.NotFoundException;
 import pl.petgo.backend.repository.GpsPointRepository;
@@ -103,6 +104,9 @@ public class GpsTrackingService {
 
         session.setStoppedAt(Instant.now());
         gpsSessionRepository.save(session);
+
+        Reservation reservation = session.getReservation();
+        reservation.setStatus(ReservationStatus.COMPLETED);
     }
 
     public List<GpsPointDto> getRouteDto(Long reservationId, AppUserDetails principal) {

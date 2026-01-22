@@ -47,6 +47,7 @@ public class SecurityConfig {
                             "/api/auth/register",
                             "/api/auth/login",
                             "/api/hello",
+                            "/api/webhooks/**",
                             "/api/photos/**"
                         ).permitAll()
                         .anyRequest().authenticated()
