@@ -64,4 +64,9 @@ public class ReviewController {
         Long savedReviewId = reviewService.addReview(userId, request);
         return ResponseEntity.created(URI.create("/api/reviews/" + savedReviewId)).build();
     }
+
+    @GetMapping("/walkSumary")
+    public ResponseEntity<DogReviewDTO> getWalkSumary(@RequestParam Long dogId) {
+        return ResponseEntity.ok(reviewService.getDogReview(dogId));
+    }
 }

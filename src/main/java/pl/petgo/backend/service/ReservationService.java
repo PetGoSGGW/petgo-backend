@@ -5,14 +5,22 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import pl.petgo.backend.domain.*;
+import pl.petgo.backend.dto.GpsPointDto;
+import pl.petgo.backend.dto.reservation.GpsRouteDto;
 import pl.petgo.backend.dto.reservation.ReservationCreateRequest;
+import pl.petgo.backend.dto.reservation.ReservationDetailsDto;
 import pl.petgo.backend.dto.reservation.ReservationDto;
+import pl.petgo.backend.exception.NotFoundException;
 import pl.petgo.backend.repository.AvailabilitySlotRepository;
 import pl.petgo.backend.repository.DogRepository;
 import pl.petgo.backend.repository.OfferRepository;
 import pl.petgo.backend.repository.ReservationRepository;
 import pl.petgo.backend.security.AppUserDetails;
+
+import java.time.Duration;
 import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.Comparator;
 import java.util.List;
 
@@ -25,6 +33,7 @@ public class ReservationService {
     private final OfferRepository offerRepository;
     private final DogRepository dogRepository;
     private final ReservationRepository reservationRepository;
+    private final GpsTrackingService gpsTrackingService;
 
     public ReservationDto createReservation(ReservationCreateRequest request, AppUserDetails userDetails) {
         User user = userDetails.getUser();
@@ -207,5 +216,68 @@ public class ReservationService {
 
         reservationRepository.save(reservation);
         log.info("Reservation {} cancelled by system (payment failed/expired).", reservationId);
+    }
+
+    public ReservationDetailsDto getReservationDetails(
+            AppUserDetails userDetails,
+            Long reservationId
+    ) {
+        User user = userDetails.getUser();
+        Long userId = user.getUserId();
+
+        Reservation reservation = reservationRepository.findById(reservationId)
+                .orElseThrow(() ->
+                        new EntityNotFoundException(
+                                "Reservation with id: " + reservationId + " does not exist"
+                        )
+                );
+
+        boolean isOwner = reservation.getOwner().getUserId().equals(userId);
+        boolean isWalker = reservation.getWalker().getUserId().equals(userId);
+        boolean isAdmin = userDetails.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+
+        if (!isOwner && !isWalker && !isAdmin) {
+            throw new AccessDeniedException(
+                    "User with id: " + userId + " has no access to reservation with id: " + reservationId
+            );
+        }
+
+        OffsetDateTime start = reservation.getScheduledStart().atOffset(ZoneOffset.UTC);
+        OffsetDateTime end = reservation.getScheduledEnd().atOffset(ZoneOffset.UTC);
+
+        GpsRouteDto gpsRoute = null;
+
+        if (reservation.getStatus() == ReservationStatus.COMPLETED) {
+            try {
+                List<GpsPointDto> route =
+                        gpsTrackingService.getRouteDto(reservationId, userDetails);
+
+                double distance =
+                        gpsTrackingService.getDistanceForReservation(reservationId, userDetails);
+
+                gpsRoute = new GpsRouteDto(
+                        true,
+                        distance,
+                        route
+                );
+            } catch (NotFoundException e) {
+                gpsRoute = new GpsRouteDto(
+                        false,
+                        0.0,
+                        List.of()
+                );
+            }
+        }
+
+        return new ReservationDetailsDto(
+                reservation.getReservationId(),
+                reservation.getStatus(),
+                reservation.getDog().getName(),
+                start,
+                end,
+                Duration.between(start, end).toMinutes(),
+                gpsRoute
+        );
     }
 }

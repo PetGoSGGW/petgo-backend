@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import pl.petgo.backend.dto.reservation.ReservationCreateRequest;
+import pl.petgo.backend.dto.reservation.ReservationDetailsDto;
 import pl.petgo.backend.dto.reservation.ReservationDto;
 import pl.petgo.backend.security.AppUserDetails;
 import pl.petgo.backend.service.ReservationService;
@@ -94,5 +95,18 @@ public class ReservationController {
         reservationService.cancelReservation(userDetails, reservationId);
 
         return ResponseEntity.ok().build();
+    }
+    @Operation(
+            summary = "Get reservation details"
+    )
+    @GetMapping("/reservations/{reservationId}")
+    public ResponseEntity<ReservationDetailsDto> getReservation(
+            @AuthenticationPrincipal AppUserDetails userDetails,
+            @PathVariable Long reservationId
+    ) {
+        ReservationDetailsDto result =
+                reservationService.getReservationDetails(userDetails, reservationId);
+
+        return ResponseEntity.ok(result);
     }
 }
