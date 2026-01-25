@@ -134,4 +134,41 @@ public class GpsTrackingService {
     private static GpsPointDto convertToDto(GpsPoint p) {
         return new GpsPointDto(p.getLatitude(), p.getLongitude(), p.getRecordedAt());
     }
+
+    public double getDistanceForReservation(Long reservationId, AppUserDetails principal) {
+        List<GpsPointDto> route = getRouteDto(reservationId, principal);
+        return calculateDistanceMeters(route);
+    }
+
+    private double calculateDistanceMeters(List<GpsPointDto> points) {
+        if (points == null || points.size() < 2) {
+            return 0.0;
+        }
+
+        final double EARTH_RADIUS_METERS = 6_371_000;
+        double totalDistance = 0.0;
+
+        for (int i = 1; i < points.size(); i++) {
+            GpsPointDto p1 = points.get(i - 1);
+            GpsPointDto p2 = points.get(i);
+
+            double lat1 = Math.toRadians(p1.latitude());
+            double lon1 = Math.toRadians(p1.longitude());
+            double lat2 = Math.toRadians(p2.latitude());
+            double lon2 = Math.toRadians(p2.longitude());
+
+            double dLat = lat2 - lat1;
+            double dLon = lon2 - lon1;
+
+            double a = Math.sin(dLat / 2) * Math.sin(dLat / 2)
+                    + Math.cos(lat1) * Math.cos(lat2)
+                    * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+
+            double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+            totalDistance += EARTH_RADIUS_METERS * c;
+        }
+
+        return totalDistance;
+    }
 }
