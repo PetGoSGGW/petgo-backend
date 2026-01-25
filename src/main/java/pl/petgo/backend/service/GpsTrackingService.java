@@ -107,6 +107,7 @@ public class GpsTrackingService {
 
         Reservation reservation = session.getReservation();
         reservation.setStatus(ReservationStatus.COMPLETED);
+        reservationRepository.save(reservation);
     }
 
     public List<GpsPointDto> getRouteDto(Long reservationId, AppUserDetails principal) {

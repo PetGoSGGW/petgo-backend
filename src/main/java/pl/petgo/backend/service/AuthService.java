@@ -7,6 +7,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import pl.petgo.backend.domain.Role;
 import pl.petgo.backend.dto.*;
 import pl.petgo.backend.domain.User;
 import pl.petgo.backend.repository.UserRepository;
@@ -35,8 +36,9 @@ public class AuthService {
                 .passwordHash(encoder.encode(req.password()))
                 .firstName(req.firstName())
                 .lastName(req.lastName())
-                .role(req.role())
+                .role(Role.USER)
                 .isActive(true)
+                .dateOfBirth(req.dateOfBirth())
                 .build();
         users.save(u);
 
