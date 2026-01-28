@@ -12,6 +12,7 @@ import pl.petgo.backend.dto.offer.OfferDto;
 import pl.petgo.backend.dto.offer.OfferUpdateRequest;
 import pl.petgo.backend.repository.OfferRepository;
 import pl.petgo.backend.repository.UserRepository;
+import java.time.Instant;
 
 @Service
 @RequiredArgsConstructor
@@ -60,8 +61,9 @@ public class OfferService {
 
     @Transactional(readOnly = true)
     public Page<OfferDto> searchOffers(Double lat, Double lon, Double radius, Pageable pageable) {
+        Instant now = Instant.now();
         if (lat == null || lon == null) {
-            return offerRepository.findDistinctByIsActiveTrueAndAvailabilitySlots_ReservationIsNull(pageable)
+            return offerRepository.findDistinctByIsActiveTrueAndAvailabilitySlots_ReservationIsNullAndAvailabilitySlots_EndTimeAfter(now, pageable)
                     .map(OfferDto::fromEntityNotReserved);
         }
 
@@ -70,7 +72,8 @@ public class OfferService {
         double latDiff = r / 111.0;
         double lonDiff = r / (111.0 * Math.cos(Math.toRadians(lat)));
 
-        return offerRepository.findDistinctByIsActiveTrueAndAvailabilitySlots_ReservationIsNullAndAvailabilitySlots_LatitudeBetweenAndAvailabilitySlots_LongitudeBetween(
+        return offerRepository.findDistinctByIsActiveTrueAndAvailabilitySlots_ReservationIsNullAndAvailabilitySlots_EndTimeAfterAndAvailabilitySlots_LatitudeBetweenAndAvailabilitySlots_LongitudeBetween(
+                now,
                 lat - latDiff, lat + latDiff,
                 lon - lonDiff, lon + lonDiff,
                 pageable
