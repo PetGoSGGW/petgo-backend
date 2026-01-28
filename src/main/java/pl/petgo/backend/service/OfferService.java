@@ -72,10 +72,15 @@ public class OfferService {
         double latDiff = r / 111.0;
         double lonDiff = r / (111.0 * Math.cos(Math.toRadians(lat)));
 
-        return offerRepository.findDistinctByIsActiveTrueAndAvailabilitySlots_ReservationIsNullAndAvailabilitySlots_EndTimeAfterAndAvailabilitySlots_LatitudeBetweenAndAvailabilitySlots_LongitudeBetween(
+        return offerRepository.findOffersInRadius(
+                lat,
+                lon,
+                r,
+                lat - latDiff,
+                lat + latDiff,
+                lon - lonDiff,
+                lon + lonDiff,
                 now,
-                lat - latDiff, lat + latDiff,
-                lon - lonDiff, lon + lonDiff,
                 pageable
         ).map(OfferDto::fromEntityNotReserved);
     }
