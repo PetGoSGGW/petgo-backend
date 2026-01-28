@@ -58,24 +58,33 @@ public class OfferService {
         return OfferDto.fromEntity(offerRepository.save(offer));
     }
 
+
     @Transactional(readOnly = true)
     public Page<OfferDto> searchOffers(Double lat, Double lon, Double radius, Pageable pageable) {
+
         if (lat == null || lon == null) {
-            return offerRepository.findDistinctByIsActiveTrueAndAvailabilitySlots_ReservationIsNull(pageable)
+            return offerRepository
+                    .findDistinctByIsActiveTrueAndAvailabilitySlots_ReservationIsNull(pageable)
                     .map(OfferDto::fromEntityNotReserved);
         }
 
-        double r = (radius != null ? radius : 10.0);
+        double r = radius != null ? radius : 10.0;
 
         double latDiff = r / 111.0;
         double lonDiff = r / (111.0 * Math.cos(Math.toRadians(lat)));
 
-        return offerRepository.findDistinctByIsActiveTrueAndAvailabilitySlots_ReservationIsNullAndAvailabilitySlots_LatitudeBetweenAndAvailabilitySlots_LongitudeBetween(
-                lat - latDiff, lat + latDiff,
-                lon - lonDiff, lon + lonDiff,
+        return offerRepository.findOffersInRadius(
+                lat,
+                lon,
+                r,
+                lat - latDiff,
+                lat + latDiff,
+                lon - lonDiff,
+                lon + lonDiff,
                 pageable
         ).map(OfferDto::fromEntityNotReserved);
     }
+
 
     @Transactional(readOnly = true)
     public OfferDto getOfferById(Long offerId) {
