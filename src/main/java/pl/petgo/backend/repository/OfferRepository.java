@@ -14,24 +14,25 @@ public interface OfferRepository extends JpaRepository<Offer, Long> {
     Optional<Offer> findByWalker_UserId(Long userId);
 
     @Query("""
-    SELECT o
-    FROM Offer o
-    WHERE o.isActive = true
-      AND EXISTS (
-          SELECT 1
-          FROM AvailabilitySlot s
-          WHERE s.offer = o
-            AND s.reservation IS NULL
-            AND s.latitude BETWEEN :minLat AND :maxLat
-            AND s.longitude BETWEEN :minLon AND :maxLon
-            AND (
-                6371 * acos(
-                    cos(radians(:lat)) * cos(radians(s.latitude)) *
-                    cos(radians(s.longitude) - radians(:lon)) +
-                    sin(radians(:lat)) * sin(radians(s.latitude))
-                )
-            ) <= :radius
-      )
+SELECT o
+FROM Offer o
+WHERE o.isActive = true
+  AND EXISTS (
+      SELECT 1
+      FROM AvailabilitySlot s
+      WHERE s.offer = o
+        AND s.reservation IS NULL
+        AND s.endTime > :now
+        AND s.latitude BETWEEN :minLat AND :maxLat
+        AND s.longitude BETWEEN :minLon AND :maxLon
+        AND (
+            6371 * acos(
+                cos(radians(:lat)) * cos(radians(s.latitude)) *
+                cos(radians(s.longitude) - radians(:lon)) +
+                sin(radians(:lat)) * sin(radians(s.latitude))
+            )
+        ) <= :radius
+  )
 """)
     Page<Offer> findOffersInRadius(
             @Param("lat") double lat,
@@ -41,7 +42,7 @@ public interface OfferRepository extends JpaRepository<Offer, Long> {
             @Param("maxLat") double maxLat,
             @Param("minLon") double minLon,
             @Param("maxLon") double maxLon,
-            Instant now,
+            @Param("now") Instant now,
             Pageable pageable
     );
 
