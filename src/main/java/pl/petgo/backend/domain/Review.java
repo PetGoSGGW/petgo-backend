@@ -61,15 +61,12 @@ public class Review {
                 .rating(rating)
                 .comment(comment);
 
-        if (reservation.getOwner().getUserId().equals(authorId)) {
+        boolean isOwner = reservation.getOwner().getUserId().equals(authorId);
+        if (isOwner) {
+            builder.author(reservation.getOwner());
             builder.subjectUser(reservation.getWalker());
         } else {
-            builder.dog(reservation.getDog());
-        }
-
-        if (ReviewType.WALKER.equals(type)) {
-            builder.subjectUser(reservation.getWalker());
-        } else if (ReviewType.DOG.equals(type) || ReviewType.WALK.equals(type)) {
+            builder.author(reservation.getWalker());
             builder.dog(reservation.getDog());
         }
 

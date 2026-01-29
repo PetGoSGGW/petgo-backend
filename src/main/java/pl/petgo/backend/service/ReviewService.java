@@ -85,6 +85,11 @@ public class ReviewService {
             throw new IllegalStateException("Cannot review an incomplete reservation");
         }
 
+        boolean alreadyHandled = reviewRepository.existsByReservationReservationIdAndReviewType(reservation.getReservationId(), request.reviewType());
+        if (alreadyHandled) {
+            throw new IllegalStateException(String.format("Reservation %s already has review for type %s", reservation.getReservationId(), request.reviewType()));
+        }
+
         ReviewType reviewType = request.reviewType();
         validateReviewerPermissions(reservation, reviewerId, reviewType);
         Review review = Review.createFromReservation(reservation, reviewType, request.rating(), request.comment(), reviewerId);
